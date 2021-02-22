@@ -7,13 +7,14 @@ StockNow is a web application that allows the user to view realtime stock charts
 I am a 3rd year student studying Computer Science at UTSC. I have previous experience developing web applications from CSCC01 where I created a react web application from scratch and also my previous internship where I worked with an Angular web application and a C# REST API. I hope to strengthen my UI building through this project.
 
 ### Jimmy Yu `jimmmy.yu@mail.utoronto.ca`
+I'm currently a 3rd year Computer Science student, specializing in software engineering at UTSC. I was able to experience working on a web application in C01, that utilised the MERN stack, where I only primarily worked on the backend. So I'm excited to have the opportunity to learn more technologies through this project.
 
 ## Beta Features
 
  - **User account creation:** Allow users to create and sign-in to an account
  - **Search up stock by their symbol:** Allow users to search for a stock using the stock's symbol
  - **Create and manage watchlist:** Allow users to add or remove stocks from their watchlist
- - **View details of a chosen stock:** Show stock data such as current market price, prvious close, todays open, market cap
+ - **View details of a chosen stock:** Show stock data such as current market price, previous close, todays open, market cap
 
 ## Final Features
 
