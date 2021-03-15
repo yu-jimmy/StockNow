@@ -5,7 +5,6 @@ const { buildSchema } = require('graphql');
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 
-const WatchList = require('./models/watchList');
 const User = require('./models/user');
 
 const app = express();
@@ -15,27 +14,20 @@ app.use(bodyParser.json());
 
 app.use('/graphql', graphqlHTTP({
     schema: buildSchema(`
-        type WatchList {
-            _id: ID!
-            user: String!
-            symbols: [String!]!
-            creator: User!
-        }
-
         type User {
             _id: ID!
             email: String!
             password: String
             user: String!
-            watchlist: WatchList!
+            symbols: [String!]!
         }
 
         type RootQuery {
-            watchList(user: String!): WatchList!
+            userWatchList(user: String!): [String!]!
         }
 
         type RootMutation {
-            addSymbol(user: String!, symbol: String!): WatchList
+            addSymbol(user: String!, symbol: String!): User
             addUser(email: String!, password: String!, user: String!): User
         }
 
@@ -45,28 +37,28 @@ app.use('/graphql', graphqlHTTP({
         }
     `),
     rootValue: {
-        watchList: (args) => {
-            return WatchList.findOne({user: args.user}).populate('creator')
+        userWatchList: (args) => {
+            return User.findOne({user: args.user})
                 .then(data => {
                     console.log(data);
-                    return data;
+                    return data.symbols;
                 })
                 .catch(err => {
                     throw err;
                 });
         },
         addSymbol: (args) => {
-            return WatchList.findOne({user: args.user})
-                .then(list => {
-                    if (list == null) {
-                        throw new Error("User is not recognized");
+            return User.findOne({user: args.user})
+                .then(user => {
+                    if (user == null) {
+                        throw new Error("User does not exist");
                     }
                     else {
-                        if (list.symbols.includes(args.symbol)) {
+                        if (user.symbols.includes(args.symbol)) {
                             throw new Error(args.symbol + " is already in the watch list");
                         }
-                        list.symbols.push(args.symbol);
-                        return list.save();
+                        user.symbols.push(args.symbol);
+                        return user.save();
                     }
                 })
                 .then(result => {
@@ -78,7 +70,6 @@ app.use('/graphql', graphqlHTTP({
                 })
         },
         addUser: (args) => {
-            let createdUser;
             return User.findOne({email: args.email})
                 .then(user => {
                     if (user) {
@@ -93,24 +84,12 @@ app.use('/graphql', graphqlHTTP({
                     const newUser = new User({
                         email: args.email,
                         password: hash,
-                        user: args.user
+                        user: args.user,
+                        symbols: []
                     });
                     return newUser.save()
                         .then(result => {
-                            createdUser = { ...result._doc, password: null };
-                            const newWatchList = new WatchList({user:args.user, symbols:[], creator: newUser});
-                            return newWatchList.save()
-                                .then(list => {
-                                    if (!list) throw new Error("WatchList does not exist"); 
-                                    return User.findOne({email: args.email, user: args.user})
-                                        .then(user => {
-                                            user.watchlist = newWatchList;
-                                            user.save();
-                                        })
-                                        .then(result => {
-                                            return createdUser;
-                                        })
-                                });
+                            return { ...result._doc, password: null };
                         });
                 })
                 .catch(err => {

@@ -14,10 +14,9 @@ const userSchema = new Schema({
         type: String,
         required: true
     },
-    watchlist: {
-        type: Schema.Types.ObjectId,
-        ref: 'WatchList'
-    }
+    symbols: [{
+        type: String
+    }]
 });
 
 module.exports = mongoose.model('User', userSchema);
