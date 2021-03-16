@@ -9,8 +9,16 @@ type User {
     symbols: [String!]!
 }
 
+type AuthData {
+    userId: ID!
+    email: String!
+    token: String!
+    tokenExp: Int!
+}
+
 type RootQuery {
     userWatchList(user: String!): [String!]!
+    login(email: String!, password: String!): AuthData!
 }
 
 type RootMutation {

@@ -1,4 +1,5 @@
 const bcrypt = require('bcrypt');
+const jsonwebtoken = require('jsonwebtoken');
 
 const User = require('../../models/user');
 
@@ -13,7 +14,10 @@ module.exports = {
                 throw err;
             });
     },
-    addSymbol: (args) => {
+    addSymbol: (args, req) => {
+        if (!req.isAuth) {
+            throw new Error("User is not authenticated");
+        }
         return User.findOne({user: args.user})
             .then(user => {
                 if (user == null) {
@@ -61,5 +65,15 @@ module.exports = {
             .catch(err => {
                 throw err;
             })
+    },
+    login: async (args) => {
+        const user = await User.findOne({email: args.email});
+        if ((!user) || (!(await bcrypt.compare(args.password, user.password)))) {
+            throw new Error("Login credentials invalid");
+        }
+        const jwt = jsonwebtoken.sign({email: args.email, userId: user.id}, 'secret', {
+            expiresIn: '12h'
+        });
+        return {userId: user.id, email: args.email, token: jwt, tokenExp: 12};
     }
 };
