@@ -1,5 +1,5 @@
 import React from "react";
-import { NavLink, Redirect } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import { Avatar, Button, CssBaseline, TextField, Paper, Grid, Typography } from "@material-ui/core";
 import { withStyles } from '@material-ui/core/styles';
 import PersonIcon from '@material-ui/icons/Person';

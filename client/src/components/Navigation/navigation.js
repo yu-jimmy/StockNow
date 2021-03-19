@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { withRouter } from 'react-router';
 import {
-MDBNavbar, MDBNavbarBrand, MDBNavbarNav, MDBNavItem, MDBNavLink, MDBFormInline,
+MDBNavbar, MDBNavbarBrand, MDBNavbarNav, MDBNavItem, MDBNavLink,
 // MDBDropdown, MDBDropdownToggle, MDBDropdownMenu, MDBDropdownItem, MDBNavbarToggler
 } from "mdbreact";
 import AuthContext from '../../context/auth-context';

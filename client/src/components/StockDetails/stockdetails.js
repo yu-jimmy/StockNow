@@ -33,7 +33,7 @@ class Dashboard extends Component{
             return quote;
         }).then(res => {
             if (res.price)
-            this.setState({finishedFetch: true, price: res.price.regularMarketPrice});
+            this.setState({finishedFetch: true, price: res.price.regularMarketPrice.toFixed(2)});
         }).catch(err => {
             this.setState({finishedFetch: true, notFound: true});  
             throw err;
@@ -48,8 +48,11 @@ class Dashboard extends Component{
 
     componentDidMount(){
         this.getQuote(this.state.symbol)
+        this.interval = setInterval(() => this.getQuote(this.state.symbol), 10000);
     }
-    
+    componentWillUnmount() {
+        clearInterval(this.interval);
+    }
     render() {
         if (!this.state.finishedFetch) {
             return (
@@ -80,7 +83,7 @@ class Dashboard extends Component{
                             <TableCell component="th" scope="row">
                                 Market Price
                             </TableCell>
-                            <TableCell align="right">${this.state.price.toFixed(2)} USD</TableCell>
+                            <TableCell align="right">${this.state.price} USD</TableCell>
                             </TableRow>
                         {/* {rows.map((row) => (
                             <TableRow key={row.name}>
