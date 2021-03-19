@@ -1,10 +1,11 @@
 import React from "react";
-import { NavLink } from 'react-router-dom';
+import { NavLink, Redirect } from 'react-router-dom';
 import { Avatar, Button, CssBaseline, TextField, Paper, Grid, Typography } from "@material-ui/core";
 import { withStyles } from '@material-ui/core/styles';
 import PersonIcon from '@material-ui/icons/Person';
 
 import bgImage from './stocks.jpg';
+import AuthContext from '../../context/auth-context';
 
 const useStyles = theme => ({
     root: {
@@ -43,6 +44,7 @@ class Landing extends React.Component {
             "password": ""
         }
     }
+    static contextType = AuthContext;
 
     handleChange = (e) => {
         this.setState({ [e.target.name]: e.target.value });
@@ -56,7 +58,7 @@ class Landing extends React.Component {
 
         fetch('http://localhost:4000/graphql', {
             method: 'POST',
-            body: JSON.stringify({query:`query {login(email:"${email}", password:"${password}"){email userId}}`}),
+            body: JSON.stringify({query:`query {login(email:"${email}", password:"${password}"){email userId token tokenExp}}`}),
             headers: {
                 'Content-Type': 'application/json'
             }
@@ -67,6 +69,9 @@ class Landing extends React.Component {
         })
         .then(res => {
           console.log(res);
+          if (res.data.login.token){
+            this.context.login(res.data.login.email, res.data.login.userId, res.data.login.token, res.data.login.tokenExp);
+          }
         })
         .catch(err => {
           throw err;
@@ -75,6 +80,7 @@ class Landing extends React.Component {
 
     render() {
         const { classes } = this.props;
+        // if (this.context.token) return <Redirect to='/' />;
         return (
             <Grid container component="main" className={classes.root}>
             <CssBaseline />
