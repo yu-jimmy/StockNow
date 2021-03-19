@@ -23,7 +23,7 @@ type RootQuery {
 
 type RootMutation {
     addSymbol(user: String!, symbol: String!): User
-    addUser(email: String!, password: String!, user: String!): User
+    signup(email: String!, password: String!, user: String!): User
 }
 
 schema {

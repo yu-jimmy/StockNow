@@ -14,6 +14,16 @@ app.use(bodyParser.json());
 
 app.use(checkAuth);
 
+app.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
+    res.setHeader('Acess-Control-Allow-Methods', 'POST,GET,OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    if (req.method === 'OPTIONS') {
+        return res.sendStatus(200);
+    }
+    next();
+});
+
 app.use('/graphql', graphqlHTTP({
     schema: schema,
     rootValue: resolvers,

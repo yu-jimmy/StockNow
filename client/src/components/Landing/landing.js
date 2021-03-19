@@ -26,11 +26,11 @@ const useStyles = theme => ({
       backgroundColor: theme.palette.success.dark,
     },
     form: {
-      width: '100%', // Fix IE 11 issue.
-      marginTop: theme.spacing(3)
+      width: '100%', 
+      marginTop: theme.spacing(4)
     },
     submit: {
-      margin: theme.spacing(3, 0, 2),
+      margin: theme.spacing(3, 0, 3),
     },
   });
 
@@ -53,6 +53,24 @@ class Landing extends React.Component {
         const email = this.state.email;
         const password = this.state.password;
         console.log(email + " " + password);
+
+        fetch('http://localhost:4000/graphql', {
+            method: 'POST',
+            body: JSON.stringify({query:`query {login(email:"${email}", password:"${password}"){email userId}}`}),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(data => {
+          if (data.status !== 200) throw new Error("Login failed");
+          return data.json();
+        })
+        .then(res => {
+          console.log(res);
+        })
+        .catch(err => {
+          throw err;
+        });
     }
 
     render() {
@@ -60,7 +78,7 @@ class Landing extends React.Component {
         return (
             <Grid container component="main" className={classes.root}>
             <CssBaseline />
-            <Grid item xs={0} sm={4} md={8} className={classes.image} />
+            <Grid item xs={false} sm={4} md={8} className={classes.image} />
             <Grid item xs={12} sm={8} md={4} component={Paper}>
               <div className={classes.paper}>
                 <Avatar className={classes.avatar}>

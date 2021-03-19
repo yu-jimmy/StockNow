@@ -39,7 +39,7 @@ module.exports = {
                 throw err;
             })
     },
-    addUser: (args) => {
+    signup: (args) => {
         return User.findOne({email: args.email})
             .then(user => {
                 if (user) {
