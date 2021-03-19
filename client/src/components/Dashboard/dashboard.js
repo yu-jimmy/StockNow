@@ -9,7 +9,7 @@ class Dashboard extends Component{
     render() {
         if (!this.context.token) return <Redirect to='/signin' />;
         return (
-            <h1>Token: {this.context.token}</h1>
+            <h1>Home page</h1>
         )
     }
 }

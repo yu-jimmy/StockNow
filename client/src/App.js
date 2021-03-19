@@ -1,11 +1,13 @@
 import './App.css';
-import {BrowserRouter, Route, Switch, Redirect} from 'react-router-dom';
+import {BrowserRouter, Route, Switch, Redirect, withRouter} from 'react-router-dom';
 import Landing from './components/Landing/landing';
 import Signup from './components/Signup/signup';
 import Navigation from './components/Navigation/navigation';
 import React, { Component }  from 'react';
 import AuthContext from './context/auth-context';
 import Dashboard from './components/Dashboard/dashboard';
+import StockDetails from './components/StockDetails/stockdetails';
+
 class App extends Component {
   state = {
     email: localStorage.getItem('email'),
@@ -47,6 +49,7 @@ class App extends Component {
                 <Route path="/home" component={Dashboard} />
                 <Route path="/signin" component={Landing} />
                 <Route path="/signup" component={Signup} />
+                <Route path="/stock/:symbol" component={withRouter(StockDetails)} />
               </Switch>
             </main>
           </AuthContext.Provider>
