@@ -7,6 +7,7 @@ import React, { Component }  from 'react';
 import AuthContext from './context/auth-context';
 import Dashboard from './components/Dashboard/dashboard';
 import StockDetails from './components/StockDetails/stockdetails';
+import Watchlist from './components/Watchlist/watchlist';
 
 class App extends Component {
   state = {
@@ -41,6 +42,7 @@ class App extends Component {
               login: this.login,
               logout: this.logout}}>
             <Navigation />
+            {this.state.token && <Watchlist />}
             <main>
               <Switch>
                 {!this.state.token && <Redirect exact from="/" to="/signin"/>}

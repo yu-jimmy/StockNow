@@ -8,11 +8,13 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
+import "./stockdetails.css"
 var yahooFinance = require('yahoo-finance');
 
 class Dashboard extends Component{
     state = {
         symbol: this.props.match.params.symbol,
+        name: "",
         price: null,
         notFound: false,
         finishedFetch: false,
@@ -33,9 +35,13 @@ class Dashboard extends Component{
             return quote;
         }).then(res => {
             if (res.price)
-            this.setState({finishedFetch: true, price: res.price.regularMarketPrice.toFixed(2)});
+            console.log(res.price);
+            this.setState({finishedFetch: true,
+                price: res.price.regularMarketPrice.toFixed(2),
+                name: res.price.longName});
         }).catch(err => {
-            this.setState({finishedFetch: true, notFound: true});  
+            this.setState({finishedFetch: true,
+                notFound: true});  
             throw err;
         });
     };
@@ -66,16 +72,18 @@ class Dashboard extends Component{
         }
         else if (this.state.notFound) {
             return (
-                <h1>Symbol {this.state.symbol} was not found</h1>
+                <div className="stock-details">
+                    <h1>Symbol {this.state.symbol} was not found</h1>
+                </div>
             )
         }
         else{
             return (
-                <TableContainer component={Paper}>
+                <TableContainer className="stock-details" component={Paper}>
                     <Table className="table" aria-label="simple table">
                         <TableHead>
                         <TableRow>
-                            <TableCell>{this.state.symbol.toUpperCase()}</TableCell>
+                            <TableCell>{this.state.symbol.toUpperCase()} ({this.state.name})</TableCell>
                         </TableRow>
                         </TableHead>
                         <TableBody>
