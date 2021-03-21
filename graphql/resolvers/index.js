@@ -5,7 +5,7 @@ const User = require('../../models/user');
 
 module.exports = {
     userWatchList: (args) => {
-        return User.findOne({user: args.user})
+        return User.findOne({email: args.email})
             .then(data => {
                 console.log(data);
                 return data.symbols;

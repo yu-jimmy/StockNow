@@ -17,7 +17,7 @@ type AuthData {
 }
 
 type RootQuery {
-    userWatchList(user: String!): [String!]!
+    userWatchList(email: String!): [String!]!
     login(email: String!, password: String!): AuthData!
 }
 
