@@ -7,7 +7,7 @@ module.exports = {
     userWatchList: (args) => {
         return User.findOne({email: args.email})
             .then(data => {
-                console.log(data);
+                // console.log(data);
                 return data.symbols;
             })
             .catch(err => {
@@ -15,20 +15,48 @@ module.exports = {
             });
     },
     addSymbol: (args, req) => {
+        console.log(args.email);
         if (!req.isAuth) {
             throw new Error("User is not authenticated");
         }
-        return User.findOne({user: args.user})
+        return User.findOne({email: args.email})
             .then(user => {
                 if (user == null) {
                     throw new Error("User does not exist");
                 }
                 else {
-                    if (user.symbols.includes(args.symbol)) {
+                    if (user.symbols.includes(args.symbol.toUpperCase())) {
                         throw new Error(args.symbol + " is already in the watch list");
                     }
-                    user.symbols.push(args.symbol);
+                    user.symbols.push(args.symbol.toUpperCase());
                     return user.save();
+                }
+            })
+            .then(result => {
+                return { ...result._doc }
+            })
+            .catch(err => {
+                console.log(err);
+                throw err;
+            })
+    },
+    deleteSymbol: (args, req) => {
+        if (!req.isAuth) {
+            throw new Error("User is not authenticated");
+        }
+        return User.findOne({email: args.email})
+            .then(user => {
+                if (user == null) {
+                    throw new Error("User does not exist");
+                }
+                else {
+                    if (!user.symbols.includes(args.symbol.toUpperCase())) {
+                        throw new Error(args.symbol + " is not in the watch list");
+                    }
+                    user.symbols = user.symbols.filter(symbol => symbol != args.symbol.toUpperCase())
+                    return user.save()
+                    
+                    
                 }
             })
             .then(result => {
@@ -74,6 +102,6 @@ module.exports = {
         const jwt = jsonwebtoken.sign({email: args.email, userId: user.id}, 'secret', {
             expiresIn: '12h'
         });
-        return {userId: user.id, email: args.email, token: jwt, tokenExp: 12};
+        return {userId: user.id, email: args.email, token: jwt, tokenExp: 12, symbols: user.symbols};
     }
 };

@@ -14,6 +14,7 @@ type AuthData {
     email: String!
     token: String!
     tokenExp: Int!
+    symbols: [String!]!
 }
 
 type RootQuery {
@@ -22,7 +23,8 @@ type RootQuery {
 }
 
 type RootMutation {
-    addSymbol(user: String!, symbol: String!): User
+    addSymbol(email: String!, symbol: String!): User
+    deleteSymbol(email: String!, symbol: String!): User
     signup(email: String!, password: String!, user: String!): User
 }
 
