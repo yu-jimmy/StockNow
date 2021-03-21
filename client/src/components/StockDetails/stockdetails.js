@@ -17,6 +17,10 @@ class Dashboard extends Component{
         symbol: this.props.match.params.symbol,
         name: "",
         price: null,
+        open: null,
+        high: null,
+        low: null,
+        close: null,
         notFound: false,
         finishedFetch: false,
         added: false,
@@ -80,6 +84,10 @@ class Dashboard extends Component{
                 else{
                     this.setState({finishedFetch: true,
                         price: res.price.regularMarketPrice,
+                        open: res.price.regularMarketOpen,
+                        high: res.price.regularMarketDayHigh,
+                        low: res.price.regularMarketDayLow,
+                        close: res.price.regularMarketPreviousClose,
                         name: res.price.longName});
                 }
             }
@@ -196,17 +204,30 @@ class Dashboard extends Component{
                             </TableCell>
                             <TableCell align="right">${this.state.price} USD</TableCell>
                             </TableRow>
-                        {/* {rows.map((row) => (
-                            <TableRow key={row.name}>
-                            <TableCell component="th" scope="row">
-                                {row.name}
-                            </TableCell>
-                            <TableCell align="right">{row.calories}</TableCell>
-                            <TableCell align="right">{row.fat}</TableCell>
-                            <TableCell align="right">{row.carbs}</TableCell>
-                            <TableCell align="right">{row.protein}</TableCell>
+                            <TableRow key="marketHigh">
+                                <TableCell component="th" scope="row">
+                                    Market High
+                                </TableCell>
+                                <TableCell align="right">${this.state.high} USD</TableCell>
                             </TableRow>
-                        ))} */}
+                            <TableRow key="marketLow">
+                                <TableCell component="th" scope="row">
+                                    Market Low
+                                </TableCell>
+                                <TableCell align="right">${this.state.low} USD</TableCell>
+                            </TableRow>
+                            <TableRow key="marketOpen">
+                                <TableCell component="th" scope="row">
+                                    Market Open
+                                </TableCell>
+                                <TableCell align="right">${this.state.open} USD</TableCell>
+                            </TableRow>
+                            <TableRow key="marketClose">
+                                <TableCell component="th" scope="row">
+                                    Market Close
+                                </TableCell>
+                                <TableCell align="right">${this.state.close} USD</TableCell>
+                            </TableRow>
                         </TableBody>
                     </Table>
                     </TableContainer>
