@@ -1,9 +1,12 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import ClipLoader from "react-spinners/ClipLoader";
+import AuthContext from '../../context/auth-context';
 import { ProSidebar, Menu, MenuItem, SubMenu, SidebarHeader } from 'react-pro-sidebar';
 import 'react-pro-sidebar/dist/css/styles.css';
 import './watchlist.css'
+import IconButton from '@material-ui/core/IconButton';
+import DeleteIcon from '@material-ui/icons/Delete';
 var yahooFinance = require('yahoo-finance');
 
 class Watchlist extends Component{
@@ -12,9 +15,32 @@ class Watchlist extends Component{
         ],
         finishedFetch: false,
     }
+
+    static contextType = AuthContext;
+
     style = {
         position: 'absolute',
-        backgroundImage: 'url(https://www.nasdaq.com/sites/acquia.prod/files/styles/1370x700/public/2020/03/16/stocks-iamchamp-adobe.jpg?h=6acbff97&itok=9UbAnU_E)'
+    }
+
+    removeFromWatchlist = (symbol) => {
+        var requestBody = JSON.stringify({query:`mutation{ deleteSymbol(email:"${this.context.email}", symbol:"${symbol}") {symbols} }`});
+        fetch('http://localhost:4000/graphql', {
+            method: 'POST',
+            body: requestBody,
+            headers:{'Content-Type': 'application/json', 'Authorization': 'Bearer ' + this.context.token}
+        })
+        .then(data => {
+            if (data.status !== 200) throw new Error("Delete symbol failed");
+            return data.json();
+        })
+        .then(res => {
+            this.context.watchlist = this.context.watchlist.filter((stock) => {return stock.symbol.toUpperCase() !== symbol.toUpperCase()})
+            this.setState({stocks: this.context.watchlist});
+            return res;
+        })
+        .catch(err => {
+            throw err;
+        });
     }
 
     getQuote = (symbol) => {
@@ -24,7 +50,7 @@ class Watchlist extends Component{
             if (err){
                 console.log(err);
             }
-            return quote.price.regularMarketPrice.toFixed(2);
+            return quote.price.regularMarketPrice;
         }).then(res => {
             if (res)
                 return res
@@ -34,35 +60,32 @@ class Watchlist extends Component{
         });
     };
 
+    deleteSymbol = (symbol) => {
+        this.context.test = "test";
+        console.log(this.context.test)
+        this.removeFromWatchlist(symbol.target.parentElement.id);
+        // var currentStocks = this.state.stocks;
+        // currentStocks = currentStocks.filter((stock) => { return stock.symbol.toUpperCase() !== symbol.target.parentElement.id.toUpperCase() });
+        // this.setState({stocks: currentStocks});
+    }
+
     componentDidMount(){
-        var symbols = ['gme', 'amc', 'pltr', 'sndl', 'msft']
-        var newState = []
-        symbols.forEach((sym) => {
-            yahooFinance.quote({
-                symbol: sym
-            }, function (err, quote) {
-                if (err){
-                    console.log(err);
-                }
-                return quote;
-            }).then(res => {
-                if (res){
-                    newState.push({symbol: sym,
-                        price: res.price.regularMarketPrice.toFixed(2)})
-                        
-                    this.setState({stocks: newState, finishedFetch: true})
-                     }
-                     
-            }).catch(err => {
-                throw err;
-            });
-        });
-            
-        //     this.state.stocks.push({symbol: sym,
-        //         price: this.getQuote(sym)})
-        // })
-        this.interval = setInterval(() => {
-            newState = this.state.stocks;
+        var symbols = [];
+        var newState = [];
+        fetch('http://localhost:4000/graphql', {
+            method: 'POST',
+            body: JSON.stringify({query:`query{ userWatchList(email:"${this.context.email}") }`}),
+            headers:{'Content-Type': 'application/json'}
+        })
+        .then(data => {
+            if (data.status !== 200) throw new Error("Retrieving symbols failed");
+            return data.json();
+        })
+        .then(res => {
+            symbols = res.data.userWatchList;
+            if (symbols.length === 0){   
+                this.setState({stocks: [], finishedFetch: true})
+            }
             symbols.forEach((sym) => {
                 yahooFinance.quote({
                     symbol: sym
@@ -72,18 +95,87 @@ class Watchlist extends Component{
                     }
                     return quote;
                 }).then(res => {
-                    if (res){
-                        newState.forEach((stock) => {
-                            if (stock.symbol === sym){
-                                stock.price = res.price.regularMarketPrice.toFixed(2)
-                            }
-                        })
-                        this.setState({stocks: newState, finishedFetch: true})
-                         }
-                         
+                    if (res.price){
+                        newState.push({symbol: sym,
+                            price: res.price.regularMarketPrice})
+                        this.context.watchlist = newState
+                        this.setState({finishedFetch: true})
+                        // this.setState({stocks: newState, finishedFetch: true})
+                        }
                 }).catch(err => {
                     throw err;
                 });
+            });
+        })
+        .catch(err => {
+            throw err;
+        });
+        
+      
+        this.interval = setInterval(() => {
+            newState = this.state.stocks;
+            console.log(newState);
+            fetch('http://localhost:4000/graphql', {
+            method: 'POST',
+            body: JSON.stringify({query:`query{ userWatchList(email:"${this.context.email}") }`}),
+            headers:{'Content-Type': 'application/json'}
+            })
+            .then(data => {
+                if (data.status !== 200) throw new Error("Retrieving symbols failed");
+                return data.json();
+            })
+            .then(res => {
+                symbols = res.data.userWatchList;
+                symbols.forEach((sym) => {
+                    yahooFinance.quote({
+                        symbol: sym
+                    }, function (err, quote) {
+                        if (err){
+                            console.log(err);
+                        }
+                        return quote;
+                    }).then(res => {
+                        if (res.price){
+                            var watchlistSymbols = newState.map((stock) => {return stock.symbol})
+                            if (!watchlistSymbols.includes(sym)){
+                                console.log(res)
+                                if (res.price.regularMarketPrice){
+                                    if (res.price.regularMarketPrice.raw){
+                                        newState.push({symbol: sym,
+                                            price: res.price.regularMarketPrice.raw})
+                                        console.log(newState)
+                                        }
+                                        else{
+                                            newState.push({symbol: sym,
+                                                price: res.price.regularMarketPrice})
+                                                console.log(newState)
+                                        }
+                                    }
+                                }
+                            else{
+                                newState.forEach((stock) => {
+                                    if (stock.symbol === sym){
+                                        if (res.price.regularMarketPrice){
+                                            if (res.price.regularMarketPrice.raw){
+                                            stock.price = res.price.regularMarketPrice.raw
+                                            }
+                                            else{
+                                                stock.price = res.price.regularMarketPrice
+                                            }
+                                        }
+                                    }
+                                })
+                            }
+                            this.setState({stocks: newState, finishedFetch: true})
+                            }
+                            
+                    }).catch(err => {
+                        throw err;
+                    });
+                });
+            })
+            .catch(err => {
+                throw err;
             });
         }, 10000);
     }
@@ -105,7 +197,7 @@ class Watchlist extends Component{
                 
             )
         }
-        else if (this.state.stocks.length === 0) {
+        else if (this.context.watchlist.length === 0) { 
             return (
                 <ProSidebar style={this.style}>
                     <SidebarHeader>
@@ -129,25 +221,40 @@ class Watchlist extends Component{
                         </div>
                         
                     </SidebarHeader>
-                    <Menu iconShape="square">
-                        {this.state.stocks.map((stock) => {
-                        // if want to see unused rewards
-                        return (
-                            <MenuItem>
-                            {stock.symbol.toUpperCase()} ${stock.price} USD
-                            <Link to={"/stock/" + stock.symbol} />
-                        </MenuItem>
-                        );
-                        })}
-                        {/* <MenuItem>
-                            GME ${} USD
-                            <Link to="/stock/gme" />
-                        </MenuItem> */}
-                        {/* <SubMenu title="Components">
-                        <MenuItem>Component 1</MenuItem>
-                        <MenuItem>Component 2</MenuItem>
-                        </SubMenu> */}
-                    </Menu>
+                    
+        <AuthContext.Consumer>{({ watchlist }) => (
+            <Menu iconShape="square">
+            {watchlist.map((stock) => {
+            // if want to see unused rewards
+            return (
+                <MenuItem>
+                    {stock.symbol.toUpperCase()} ${stock.price} USD
+                    <Link to={"/stock/" + stock.symbol} />
+                    <div className="delete-button">
+                        <IconButton
+                        variant="contained"
+                        color="secondary"
+                        size="small"
+                        onClick={this.deleteSymbol}
+                        >
+                            <DeleteIcon id={stock.symbol}/>
+                        </IconButton>
+                    </div>
+                </MenuItem>
+            );
+            })}
+            {/* <MenuItem>
+                GME ${} USD
+                <Link to="/stock/gme" />
+            </MenuItem> */}
+            {/* <SubMenu title="Components">
+            <MenuItem>Component 1</MenuItem>
+            <MenuItem>Component 2</MenuItem>
+            </SubMenu> */}
+        </Menu>
+          )}
+                    
+                    </AuthContext.Consumer>
                 </ProSidebar>
             )
         }

@@ -8,6 +8,7 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
+import { Button } from '@material-ui/core';
 import "./stockdetails.css"
 var yahooFinance = require('yahoo-finance');
 
@@ -18,27 +19,73 @@ class Dashboard extends Component{
         price: null,
         notFound: false,
         finishedFetch: false,
+        added: false,
     };
 
     static contextType = AuthContext;
 
-    getQuote = (symbol) => {
+    addToWatchlist = () => {
+        var requestBody = JSON.stringify({query:`mutation{ addSymbol(email:"${this.context.email}", symbol:"${this.state.symbol}") {symbols} }`});
+        fetch('http://localhost:4000/graphql', {
+            method: 'POST',
+            body: requestBody,
+            headers:{'Content-Type': 'application/json', 'Authorization': 'Bearer ' + this.context.token}
+        })
+        .then(data => {
+            if (data.status !== 200) throw new Error("Retrieving symbols failed");
+            return data.json();
+        })
+        .then(res => {
+            console.log(res);
+            this.addStockToWatchlist();
+            this.setState({ added: true })
+        })
+        .catch(err => {
+            throw err;
+        });
+    }
+
+    addStockToWatchlist = () => {
         yahooFinance.quote({
-            symbol: symbol
-            // from: '2012-01-01',
-            // to: '2012-12-31',
-            // period: 'd'  // 'd' (daily), 'w' (weekly), 'm' (monthly), 'v' (dividends only)
+            symbol: this.state.symbol
         }, function (err, quote) {
             if (err){
                 console.log(err);
             }
             return quote;
         }).then(res => {
-            if (res.price)
-            console.log(res.price);
-            this.setState({finishedFetch: true,
-                price: res.price.regularMarketPrice.toFixed(2),
-                name: res.price.longName});
+            if (res.price.regularMarketPrice)
+                this.context.watchlist.push({symbol: this.state.symbol.toUpperCase(),
+                    price: res.price.regularMarketPrice});
+        }).catch(err => {
+            throw err;
+        });
+    }
+
+    getQuote = (symbol) => {
+        yahooFinance.quote({
+            symbol: symbol
+        }, function (err, quote) {
+            if (err){
+                console.log(err);
+            }
+            return quote;
+        }).then(res => {
+            if (res.price.regularMarketPrice){
+                if (res.price.regularMarketPrice.raw){
+                    this.setState({finishedFetch: true,
+                        price: res.price.regularMarketPrice.raw,
+                        name: res.price.longName});
+                }
+                else{
+                    this.setState({finishedFetch: true,
+                        price: res.price.regularMarketPrice,
+                        name: res.price.longName});
+                }
+            }
+            else
+                this.setState({finishedFetch: true,
+                    notFound: true});
         }).catch(err => {
             this.setState({finishedFetch: true,
                 notFound: true});  
@@ -47,12 +94,50 @@ class Dashboard extends Component{
     };
 
     componentWillReceiveProps(props) {
-        this.setState({finishedFetch: false, notFound: false});
+        this.setState({finishedFetch: false, notFound: false, added: false});
+        fetch('http://localhost:4000/graphql', {
+        method: 'POST',
+        body: JSON.stringify({query:`query{ userWatchList(email:"${this.context.email}") }`}),
+        headers:{'Content-Type': 'application/json'}
+        })
+        .then(data => {
+            if (data.status !== 200) throw new Error("Retrieving symbols failed");
+            return data.json();
+        })
+        .then(res => {
+            res.data.userWatchList.forEach((sym => {
+                if (sym.toUpperCase() === this.props.match.params.symbol.toUpperCase()) {
+                    this.setState({ added: true })
+                }
+            }))
+        })
+        .catch(err => {
+            throw err;
+        });
         this.setState({symbol: props.match.params.symbol});
         this.getQuote(props.match.params.symbol)  
     }
 
     componentDidMount(){
+        fetch('http://localhost:4000/graphql', {
+        method: 'POST',
+        body: JSON.stringify({query:`query{ userWatchList(email:"${this.context.email}") }`}),
+        headers:{'Content-Type': 'application/json'}
+        })
+        .then(data => {
+            if (data.status !== 200) throw new Error("Retrieving symbols failed");
+            return data.json();
+        })
+        .then(res => {
+            res.data.userWatchList.forEach((sym => {
+                if (sym.toUpperCase() === this.props.match.params.symbol.toUpperCase()) {
+                    this.setState({ added: true })
+                }
+            }))
+        })
+        .catch(err => {
+            throw err;
+        });
         this.getQuote(this.state.symbol)
         this.interval = setInterval(() => this.getQuote(this.state.symbol), 10000);
     }
@@ -83,7 +168,25 @@ class Dashboard extends Component{
                     <Table className="table" aria-label="simple table">
                         <TableHead>
                         <TableRow>
-                            <TableCell>{this.state.symbol.toUpperCase()} ({this.state.name})</TableCell>
+                            <TableCell>{this.state.symbol.toUpperCase()} ({this.state.name + ") "}
+                                {!this.state.added &&
+                                <Button
+                                    variant="contained"
+                                    color="primary"
+                                    onClick={this.addToWatchlist}
+                                >
+                                    Add
+                                </Button>}
+                                {this.state.added &&
+                                <Button
+                                    variant="contained"
+                                    color="primary"
+                                    disabled
+                                >
+                                    Added
+                                </Button>}
+                            </TableCell>
+                            
                         </TableRow>
                         </TableHead>
                         <TableBody>

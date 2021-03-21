@@ -5,3 +5,9 @@
     font-size: 14px;
     letter-spacing: 1px;
 }
+
+.delete-button{
+    position: relative;
+    float: right;
+    height: 50%
+}

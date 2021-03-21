@@ -13,21 +13,25 @@ class App extends Component {
   state = {
     email: localStorage.getItem('email'),
     token: localStorage.getItem('token'),
-    userId: localStorage.getItem('userId')
+    userId: localStorage.getItem('userId'),
+    watchlist: localStorage.getItem('watchlist')
+    
   };
 
-  login = (email, userId, token, tokenExp) => {
+  login = (email, userId, token, tokenExp, symbols) => {
     localStorage.setItem('email', email);
     localStorage.setItem('token', token);
     localStorage.setItem('userId', userId);
-    this.setState({ email: email, token: token, userId: userId});
+    localStorage.setItem('watchlist', symbols);
+    this.setState({ email: email, token: token, userId: userId, watchlist: symbols});
   };
 
   logout = () => {
     localStorage.removeItem('email');
     localStorage.removeItem('token');
     localStorage.removeItem('userId');
-    this.setState({ email: null, token: null, userId: null});
+    localStorage.removeItem('watchlist');
+    this.setState({ email: null, token: null, userId: null, watchlist: null});
   };
 
   render() {
@@ -39,6 +43,7 @@ class App extends Component {
               email: this.state.email,
               userId: this.state.userId,
               token: this.state.token,
+              watchlist: this.state.watchlist,
               login: this.login,
               logout: this.logout}}>
             <Navigation />
