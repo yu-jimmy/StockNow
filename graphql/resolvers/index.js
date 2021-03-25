@@ -84,6 +84,13 @@ module.exports = {
             throw new Error("Name field is empty");
             return;
         }
+        
+        // Email validation
+        const regex = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;
+        if (!(regex.test(args.email))) {
+            throw new Error("Invalid email format");
+            return;
+        }
         return User.findOne({email: args.email})
             .then(user => {
                 if (user) {
