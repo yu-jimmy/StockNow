@@ -45,7 +45,6 @@ class Signup extends React.Component {
         const email = this.state.email;
         const password = this.state.password;
         const user = this.state.name;
-        console.log(email + " " + password + " " + user);
 
         fetch('http://localhost:4000/graphql', {
             method: 'POST',

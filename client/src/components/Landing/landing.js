@@ -1,8 +1,12 @@
 import React from "react";
-import { NavLink } from 'react-router-dom';
+import { NavLink, Redirect } from 'react-router-dom';
 import { Avatar, Button, CssBaseline, TextField, Paper, Grid, Typography } from "@material-ui/core";
 import { withStyles } from '@material-ui/core/styles';
 import PersonIcon from '@material-ui/icons/Person';
+
+import Snackbar from '@material-ui/core/Snackbar';
+import IconButton from '@material-ui/core/IconButton';
+import CloseIcon from '@material-ui/icons/Close';
 
 import bgImage from './stocks.jpg';
 import AuthContext from '../../context/auth-context';
@@ -41,7 +45,10 @@ class Landing extends React.Component {
         super(props);
         this.state = {
             "email": "",
-            "password": ""
+            "password": "",
+            isError: false,
+            errorMessage: '',
+            open: false
         }
     }
     static contextType = AuthContext;
@@ -54,7 +61,6 @@ class Landing extends React.Component {
         e.preventDefault();
         const email = this.state.email;
         const password = this.state.password;
-        console.log(email + " " + password);
 
         fetch('http://localhost:4000/graphql', {
             method: 'POST',
@@ -71,21 +77,50 @@ class Landing extends React.Component {
           console.log(res);
           if (res.data.login.token){
             this.context.login(res.data.login.email, res.data.login.userId, res.data.login.token, res.data.login.tokenExp, res.data.login.symbols);
+            this.setState({isError: false, errorMessage: ''});
           }
         })
         .catch(err => {
-          throw err;
+          //throw err;
+          console.log(err);
+          //alert("Invalid credentials");
+          this.setState({isError: true, errorMessage: err, open: true});
         });
+    }
+
+    handleClose = () => {
+      this.setState({open:false});
     }
 
     render() {
         const { classes } = this.props;
-        // if (this.context.token) return <Redirect to='/' />;
+
         return (
             <Grid container component="main" className={classes.root}>
             <CssBaseline />
             <Grid item xs={false} sm={4} md={8} className={classes.image} />
             <Grid item xs={12} sm={8} md={4} component={Paper}>
+              {this.state.isError && 
+                <div>
+                  <Snackbar
+                    anchorOrigin={{
+                      vertical: 'bottom',
+                      horizontal: 'right',
+                    }}
+                    open={this.state.open}
+                    autoHideDuration={6000}
+                    onClose={this.handleClose}
+                    message="Invalid Credentials"
+                    action={
+                      <React.Fragment>
+                        <IconButton size="small" aria-label="close" color="inherit" onClick={this.handleClose}>
+                          <CloseIcon fontSize="small" />
+                        </IconButton>
+                      </React.Fragment>
+                    }
+                  />
+                </div>
+              }
               <div className={classes.paper}>
                 <Avatar className={classes.avatar}>
                   <PersonIcon />
