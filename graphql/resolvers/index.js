@@ -68,9 +68,26 @@ module.exports = {
             })
     },
     signup: (args) => {
+        if(args.email === '' && args.password === '' && args.user === '') {
+            throw new Error("Enter your credentials to register an account");
+            return;
+        }
+        if(args.email === '') {
+            throw new Error("Email field is empty");
+            return;
+        }
+        if(args.password === '') {
+            throw new Error("Password field is empty");
+            return;
+        }
+        if(args.user === '') {
+            throw new Error("Name field is empty");
+            return;
+        }
         return User.findOne({email: args.email})
             .then(user => {
                 if (user) {
+                    console.log("email exists")
                     throw new Error("User with this email already exists.")
                 }
                 return bcrypt.genSalt(10)

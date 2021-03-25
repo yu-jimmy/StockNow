@@ -77,14 +77,13 @@ class Landing extends React.Component {
           console.log(res);
           if (res.data.login.token){
             this.context.login(res.data.login.email, res.data.login.userId, res.data.login.token, res.data.login.tokenExp, res.data.login.symbols);
-            this.setState({isError: false, errorMessage: ''});
+            this.setState({isError: false});
           }
         })
         .catch(err => {
           //throw err;
           console.log(err);
-          //alert("Invalid credentials");
-          this.setState({isError: true, errorMessage: err, open: true});
+          this.setState({isError: true, open: true});
         });
     }
 

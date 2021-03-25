@@ -1,8 +1,12 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, Redirect } from 'react-router-dom';
 import { Avatar, Button, Container, CssBaseline, TextField, Grid, Typography } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
 import PersonIcon from '@material-ui/icons/Person';
+
+import Snackbar from '@material-ui/core/Snackbar';
+import IconButton from '@material-ui/core/IconButton';
+import CloseIcon from '@material-ui/icons/Close';
 
 
 const useStyles = theme => ({
@@ -32,7 +36,11 @@ class Signup extends React.Component {
         this.state = {
             "email": "",
             "password": "",
-            "name": ""
+            "name": "",
+            isError: false,
+            errorMessage: 'Signup failed!',
+            open: false,
+            signIn: false
         }
     }
 
@@ -46,6 +54,8 @@ class Signup extends React.Component {
         const password = this.state.password;
         const user = this.state.name;
 
+        this.setState({signIn: false});
+
         fetch('http://localhost:4000/graphql', {
             method: 'POST',
             body: JSON.stringify({query:`mutation {signup(email:"${email}", password:"${password}", user:"${user}"){_id email user}}`}),
@@ -58,15 +68,31 @@ class Signup extends React.Component {
           return data.json();
         })
         .then(res => {
-            console.log(res);
+            if(res.errors) {
+                this.setState({isError: true, errorMessage: res.errors[0].message, open: true})
+            }
+            else {
+                this.setState({isError: false, signIn: true});
+            }
         })
         .catch(err => {
           throw err;
         });
     }
 
+    handleClose = () => {
+        this.setState({open:false});
+      }
+
     render() {
         const { classes } = this.props;
+
+        if ((!(this.state.isError)) && this.state.signIn) {
+            return (
+                <Redirect to="/" />
+            );
+        }
+
         return (
           <Container component="main" maxWidth="xs">
             <CssBaseline />
@@ -79,6 +105,27 @@ class Signup extends React.Component {
               </Typography>
               <form className={classes.form} noValidate onSubmit={this.handleSubmit}>
                 <Grid container spacing={2}>
+                {this.state.isError && 
+                    <div>
+                        <Snackbar
+                        anchorOrigin={{
+                            vertical: 'bottom',
+                            horizontal: 'right',
+                        }}
+                        open={this.state.open}
+                        autoHideDuration={6000}
+                        onClose={this.handleClose}
+                        message={this.state.errorMessage}
+                        action={
+                            <React.Fragment>
+                            <IconButton size="small" aria-label="close" color="inherit" onClick={this.handleClose}>
+                                <CloseIcon fontSize="small" />
+                            </IconButton>
+                            </React.Fragment>
+                        }
+                        />
+                    </div>
+                }
                   <Grid item xs={12} sm={12}>
                     <TextField
                       variant="outlined"
