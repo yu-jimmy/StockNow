@@ -11,7 +11,7 @@ import CloseIcon from '@material-ui/icons/Close';
 import bgImage from './stocks.jpg';
 import AuthContext from '../../context/auth-context';
 
-const backend = process.env.NODE_ENV === 'production' ? 'https://stocknow.herokuapp.com/' : 'http://localhost:4000';
+const backend = process.env.NODE_ENV === 'production' ? 'https://stocknow.herokuapp.com' : 'http://localhost:4000';
 
 const useStyles = theme => ({
     root: {
