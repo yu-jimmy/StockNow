@@ -1,9 +1,8 @@
 import React, { Component }  from 'react';
 import AuthContext from '../../context/auth-context';
-import { Box, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@material-ui/core';
+import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
 import { Alert, AlertTitle } from '@material-ui/lab';
-var yahooFinance = require('yahoo-finance');
 
 
 const useStyles = theme => ({

@@ -1,5 +1,6 @@
 const bcrypt = require('bcrypt');
 const jsonwebtoken = require('jsonwebtoken');
+const passwordStrength = require('pwd-strength');
 
 const User = require('../../models/user');
 
@@ -70,27 +71,27 @@ module.exports = {
     signup: (args) => {
         if(args.email === '' && args.password === '' && args.user === '') {
             throw new Error("Enter your credentials to register an account");
-            return;
         }
         if(args.email === '') {
             throw new Error("Email field is empty");
-            return;
         }
         if(args.password === '') {
             throw new Error("Password field is empty");
-            return;
         }
         if(args.user === '') {
             throw new Error("Name field is empty");
-            return;
         }
         
         // Email validation
         const regex = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;
         if (!(regex.test(args.email))) {
             throw new Error("Invalid email format");
-            return;
         }
+
+        if (passwordStrength(args.password).key == 'error') {
+            throw new Error("Password invalid: " + passwordStrength(args.password).message);
+        }
+
         return User.findOne({email: args.email})
             .then(user => {
                 if (user) {
