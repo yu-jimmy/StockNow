@@ -11,6 +11,8 @@ import CloseIcon from '@material-ui/icons/Close';
 import bgImage from './stocks.jpg';
 import AuthContext from '../../context/auth-context';
 
+const backend = process.env.NODE_ENV === 'production' ? 'https://stocknow.herokuapp.com/' : 'http://localhost:4000';
+
 const useStyles = theme => ({
     root: {
       height: '100vh',
@@ -62,7 +64,7 @@ class Landing extends React.Component {
         const email = this.state.email;
         const password = this.state.password;
 
-        fetch('http://localhost:4000/graphql', {
+        fetch(`${backend}/graphql`, {
             method: 'POST',
             body: JSON.stringify({query:`query {login(email:"${email}", password:"${password}"){email userId token tokenExp symbols}}`}),
             headers: {
