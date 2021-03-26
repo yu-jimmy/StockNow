@@ -8,6 +8,7 @@ import Snackbar from '@material-ui/core/Snackbar';
 import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
 
+const backend = process.env.NODE_ENV === 'production' ? 'https://stocknow.herokuapp.com' : 'http://localhost:4000';
 
 const useStyles = theme => ({
     paper: {
@@ -56,7 +57,7 @@ class Signup extends React.Component {
 
         this.setState({signIn: false});
 
-        fetch('http://localhost:4000/graphql', {
+        fetch(`${backend}/graphql`, {
             method: 'POST',
             body: JSON.stringify({query:`mutation {signup(email:"${email}", password:"${password}", user:"${user}"){_id email user}}`}),
             headers: {

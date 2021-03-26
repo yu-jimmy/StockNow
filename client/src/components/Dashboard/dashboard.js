@@ -4,6 +4,7 @@ import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow }
 import { withStyles } from '@material-ui/core/styles';
 import { Alert, AlertTitle } from '@material-ui/lab';
 
+const backend = process.env.NODE_ENV === 'production' ? 'https://stocknow.herokuapp.com' : 'http://localhost:4000';
 
 const useStyles = theme => ({
     root: {
@@ -35,7 +36,7 @@ class Dashboard extends Component{
     state = { rows: [] };
 
   componentDidMount() {
-    fetch('http://localhost:4000/graphql', {
+    fetch(`${backend}/graphql`, {
             method: 'POST',
             body: JSON.stringify({query:`query{ userWatchList(email:"${this.context.email}") }`}),
             headers:{'Content-Type': 'application/json'}

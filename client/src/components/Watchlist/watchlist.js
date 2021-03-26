@@ -9,6 +9,8 @@ import IconButton from '@material-ui/core/IconButton';
 import DeleteIcon from '@material-ui/icons/Delete';
 var yahooFinance = require('yahoo-finance');
 
+const backend = process.env.NODE_ENV === 'production' ? 'https://stocknow.herokuapp.com' : 'http://localhost:4000';
+
 class Watchlist extends Component{
     state = {
         stocks: [
@@ -24,7 +26,7 @@ class Watchlist extends Component{
 
     removeFromWatchlist = (symbol) => {
         var requestBody = JSON.stringify({query:`mutation{ deleteSymbol(email:"${this.context.email}", symbol:"${symbol}") {symbols} }`});
-        fetch('http://localhost:4000/graphql', {
+        fetch(`${backend}/graphql`, {
             method: 'POST',
             body: requestBody,
             headers:{'Content-Type': 'application/json', 'Authorization': 'Bearer ' + this.context.token}
@@ -72,7 +74,7 @@ class Watchlist extends Component{
     componentDidMount(){
         var symbols = [];
         var newState = [];
-        fetch('http://localhost:4000/graphql', {
+        fetch(`${backend}/graphql`, {
             method: 'POST',
             body: JSON.stringify({query:`query{ userWatchList(email:"${this.context.email}") }`}),
             headers:{'Content-Type': 'application/json'}

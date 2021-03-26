@@ -12,6 +12,8 @@ import { Button } from '@material-ui/core';
 import "./stockdetails.css"
 var yahooFinance = require('yahoo-finance');
 
+const backend = process.env.NODE_ENV === 'production' ? 'https://stocknow.herokuapp.com' : 'http://localhost:4000';
+
 class Dashboard extends Component{
     state = {
         symbol: this.props.match.params.symbol,
@@ -30,7 +32,7 @@ class Dashboard extends Component{
 
     addToWatchlist = () => {
         var requestBody = JSON.stringify({query:`mutation{ addSymbol(email:"${this.context.email}", symbol:"${this.state.symbol}") {symbols} }`});
-        fetch('http://localhost:4000/graphql', {
+        fetch(`${backend}/graphql`, {
             method: 'POST',
             body: requestBody,
             headers:{'Content-Type': 'application/json', 'Authorization': 'Bearer ' + this.context.token}
@@ -103,7 +105,7 @@ class Dashboard extends Component{
 
     componentWillReceiveProps(props) {
         this.setState({finishedFetch: false, notFound: false, added: false});
-        fetch('http://localhost:4000/graphql', {
+        fetch(`${backend}/graphql`, {
         method: 'POST',
         body: JSON.stringify({query:`query{ userWatchList(email:"${this.context.email}") }`}),
         headers:{'Content-Type': 'application/json'}
@@ -127,7 +129,7 @@ class Dashboard extends Component{
     }
 
     componentDidMount(){
-        fetch('http://localhost:4000/graphql', {
+        fetch(`${backend}/graphql`, {
         method: 'POST',
         body: JSON.stringify({query:`query{ userWatchList(email:"${this.context.email}") }`}),
         headers:{'Content-Type': 'application/json'}
