@@ -30,8 +30,15 @@ app.use('/graphql', graphqlHTTP({
     graphiql: true
 }));
 
-mongoose.connect(db, { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true })
+if (process.env.NODE_ENV === "production") {
+    app.use(express.static(path.join(__dirname, 'client/build')));
+    app.get('*', function(req, res) {
+        res.sendFile(path.join(__dirname, 'client/build', 'index.html'));
+    });
+}
+
+mongoose.connect(process.env.MONGODB_URI || db, { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true })
     .then(()=> console.log('Mongo Connected...'))
     .catch(err => console.log(err));
 
-app.listen(4000);
+app.listen(process.env.PORT || 4000);

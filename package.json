@@ -4,6 +4,7 @@
   "description": "StockNow is a web application that allows the user to view realtime stock charts and manage their own list of stocks to watch.",
   "main": "index.js",
   "scripts": {
+    "heroku-postbuild": "cd client && npm install && npm run build",
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodemon app.js"
   },
