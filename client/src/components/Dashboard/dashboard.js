@@ -56,7 +56,7 @@ class Dashboard extends Component{
 
   componentDidUpdate() {
       console.log(this.context)
-    fetch('http://localhost:4000/graphql', {
+    fetch(`${backend}/graphql`, {
         method: 'POST',
         body: JSON.stringify({query:`query{ userWatchList(email:"${this.context.email}") }`}),
         headers:{'Content-Type': 'application/json'}
