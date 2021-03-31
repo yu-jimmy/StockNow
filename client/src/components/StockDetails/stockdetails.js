@@ -10,7 +10,7 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import { Button } from '@material-ui/core';
 import "./stockdetails.css"
-var yahooFinance = require('yahoo-finance');
+//var yahooFinance = require('yahoo-finance');
 
 const backend = process.env.NODE_ENV === 'production' ? 'https://stocknow.herokuapp.com' : 'http://localhost:4000';
 
@@ -52,56 +52,96 @@ class Dashboard extends Component{
     }
 
     addStockToWatchlist = () => {
-        yahooFinance.quote({
-            symbol: this.state.symbol
-        }, function (err, quote) {
-            if (err){
-                console.log(err);
-            }
-            return quote;
-        }).then(res => {
-            if (res.price.regularMarketPrice)
-                this.context.watchlist.push({symbol: this.state.symbol.toUpperCase(),
-                    price: res.price.regularMarketPrice});
-        }).catch(err => {
-            throw err;
-        });
+        const request = require('request');
+
+        request(`https://finnhub.io/api/v1/quote?symbol=${this.state.symbol}&token=c1hea6f48v6qtr46akgg`, { json: true }, (err, res, body) => {
+        if (err) { 
+            console.log(err);
+            throw err; 
+        }
+        if (res.body) {
+            this.context.watchlist.push({symbol: this.state.symbol.toUpperCase(), price: res.body.c});
+        }
+    });
+        // yahooFinance.quote({
+        //     symbol: this.state.symbol
+        // }, function (err, quote) {
+        //     if (err){
+        //         console.log(err);
+        //     }
+        //     return quote;
+        // }).then(res => {
+        //     if (res.price.regularMarketPrice)
+        //         this.context.watchlist.push({symbol: this.state.symbol.toUpperCase(),
+        //             price: res.price.regularMarketPrice});
+        // }).catch(err => {
+        //     throw err;
+        // });
     }
 
     getQuote = (symbol) => {
-        yahooFinance.quote({
-            symbol: symbol
-        }, function (err, quote) {
-            if (err){
-                console.log(err);
-            }
-            return quote;
-        }).then(res => {
-            if (res.price.regularMarketPrice){
-                if (res.price.regularMarketPrice.raw){
-                    this.setState({finishedFetch: true,
-                        price: res.price.regularMarketPrice.raw,
-                        name: res.price.longName});
-                }
-                else{
-                    this.setState({finishedFetch: true,
-                        price: res.price.regularMarketPrice,
-                        open: res.price.regularMarketOpen,
-                        high: res.price.regularMarketDayHigh,
-                        low: res.price.regularMarketDayLow,
-                        close: res.price.regularMarketPreviousClose,
-                        name: res.price.longName});
-                }
-            }
-            else
-                this.setState({finishedFetch: true,
-                    notFound: true});
-        }).catch(err => {
-            this.setState({finishedFetch: true,
-                notFound: true});  
-            throw err;
-        });
+        const request = require('request');
+
+        request(`https://finnhub.io/api/v1/quote?symbol=${symbol}&token=c1hea6f48v6qtr46akgg`, { json: true }, (err, res, body) => {
+        if (err) { 
+            console.log(err); 
+            this.setState({finishedFetch: true, notFound: true});
+            throw err; 
+        }
+        console.log(res.body);
+        if (res.body) {
+            this.setState({finishedFetch: true, notFound: false, price: res.body.c, open: res.body.o, high: res.body.h, low: res.body.l, close: res.body.pc});
+        }
+    });
+        // yahooFinance.quote({
+        //     symbol: symbol
+        // }, function (err, quote) {
+        //     if (err){
+        //         console.log(err);
+        //     }
+        //     return quote;
+        // }).then(res => {
+        //     if (res.price.regularMarketPrice){
+        //         if (res.price.regularMarketPrice.raw){
+        //             this.setState({finishedFetch: true,
+        //                 price: res.price.regularMarketPrice.raw,
+        //                 name: res.price.longName});
+        //         }
+        //         else{
+        //             this.setState({finishedFetch: true,
+        //                 price: res.price.regularMarketPrice,
+        //                 open: res.price.regularMarketOpen,
+        //                 high: res.price.regularMarketDayHigh,
+        //                 low: res.price.regularMarketDayLow,
+        //                 close: res.price.regularMarketPreviousClose,
+        //                 name: res.price.longName});
+        //         }
+        //     }
+        //     else
+        //         this.setState({finishedFetch: true,
+        //             notFound: true});
+        // }).catch(err => {
+        //     this.setState({finishedFetch: true,
+        //         notFound: true});  
+        //     throw err;
+        // });
     };
+
+    getSymbolName = (symbol) => {
+        const request = require('request');
+
+        request(`https://finnhub.io/api/v1/stock/profile2?symbol=${symbol}&token=c1hea6f48v6qtr46akgg`, { json: true }, (err, res, body) => {
+            if (err) { 
+                console.log(err); 
+                this.setState({finishedFetch: true, notFound: true});
+                throw err; 
+            }
+            console.log(res.body);
+            if (res.body) {
+                this.setState({finishedFetch: true, notFound: false, name: res.body.name});
+            }
+        });
+    }
 
     componentWillReceiveProps(props) {
         this.setState({finishedFetch: false, notFound: false, added: false});
@@ -125,6 +165,7 @@ class Dashboard extends Component{
             throw err;
         });
         this.setState({symbol: props.match.params.symbol});
+        this.getSymbolName(props.match.params.symbol)
         this.getQuote(props.match.params.symbol)  
     }
 
@@ -149,6 +190,7 @@ class Dashboard extends Component{
             throw err;
         });
         this.getQuote(this.state.symbol)
+        this.getSymbolName(this.state.symbol)
         this.interval = setInterval(() => this.getQuote(this.state.symbol), 10000);
     }
     componentWillUnmount() {
