@@ -21,7 +21,7 @@ class Watchlist extends Component{
     static contextType = AuthContext;
 
     style = {
-        position: 'absolute',
+        position: 'fixed',
     }
 
     removeFromWatchlist = (symbol) => {
@@ -57,29 +57,12 @@ class Watchlist extends Component{
                 return res.body.c;
             }
         });
-        // return yahooFinance.quote({
-        //     symbol: symbol
-        // }, function (err, quote) {
-        //     if (err){
-        //         console.log(err);
-        //     }
-        //     return quote.price.regularMarketPrice;
-        // }).then(res => {
-        //     if (res)
-        //         return res
-        //     // this.setState({finishedFetch: true, price: res.price.regularMarketPrice.toFixed(2)});
-        // }).catch(err => {
-        //     throw err;
-        // });
     };
 
     deleteSymbol = (symbol) => {
         this.context.test = "test";
         console.log(this.context.test)
         this.removeFromWatchlist(symbol.target.parentElement.id);
-        // var currentStocks = this.state.stocks;
-        // currentStocks = currentStocks.filter((stock) => { return stock.symbol.toUpperCase() !== symbol.target.parentElement.id.toUpperCase() });
-        // this.setState({stocks: currentStocks});
     }
 
     componentDidMount(){
@@ -113,25 +96,6 @@ class Watchlist extends Component{
                         this.setState({finishedFetch: true});
                     }
                 });
-
-                // yahooFinance.quote({
-                //     symbol: sym
-                // }, function (err, quote) {
-                //     if (err){
-                //         console.log(err);
-                //     }
-                //     return quote;
-                // }).then(res => {
-                //     if (res.price){
-                //         newState.push({symbol: sym,
-                //             price: res.price.regularMarketPrice})
-                //         this.context.watchlist = newState
-                //         this.setState({finishedFetch: true})
-                //         // this.setState({stocks: newState, finishedFetch: true})
-                //         }
-                // }).catch(err => {
-                //     throw err;
-                // });
             });
         })
         .catch(err => {
@@ -180,51 +144,6 @@ class Watchlist extends Component{
                             this.setState({stocks: newState, finishedFetch: true})
                         }
                     });
-                    // yahooFinance.quote({
-                    //     symbol: sym
-                    // }, function (err, quote) {
-                    //     if (err){
-                    //         console.log(err);
-                    //     }
-                    //     return quote;
-                    // }).then(res => {
-                    //     if (res.price){
-                    //         var watchlistSymbols = newState.map((stock) => {return stock.symbol})
-                    //         if (!watchlistSymbols.includes(sym)){
-                    //             console.log(res)
-                    //             if (res.price.regularMarketPrice){
-                    //                 if (res.price.regularMarketPrice.raw){
-                    //                     newState.push({symbol: sym,
-                    //                         price: res.price.regularMarketPrice.raw})
-                    //                     console.log(newState)
-                    //                     }
-                    //                     else{
-                    //                         newState.push({symbol: sym,
-                    //                             price: res.price.regularMarketPrice})
-                    //                             console.log(newState)
-                    //                     }
-                    //                 }
-                    //             }
-                    //         else{
-                    //             newState.forEach((stock) => {
-                    //                 if (stock.symbol === sym){
-                    //                     if (res.price.regularMarketPrice){
-                    //                         if (res.price.regularMarketPrice.raw){
-                    //                         stock.price = res.price.regularMarketPrice.raw
-                    //                         }
-                    //                         else{
-                    //                             stock.price = res.price.regularMarketPrice
-                    //                         }
-                    //                     }
-                    //                 }
-                    //             })
-                    //         }
-                    //         this.setState({stocks: newState, finishedFetch: true})
-                    //         }
-                            
-                    // }).catch(err => {
-                    //     throw err;
-                    // });
                 });
             })
             .catch(err => {
@@ -274,39 +193,29 @@ class Watchlist extends Component{
                         </div>
                         
                     </SidebarHeader>
-                    
-        <AuthContext.Consumer>{({ watchlist }) => (
-            <Menu iconShape="square">
-            {watchlist.map((stock) => {
-            // if want to see unused rewards
-            return (
-                <MenuItem>
-                    {stock.symbol.toUpperCase()} ${stock.price} USD
-                    <Link to={"/stock/" + stock.symbol} />
-                    <div className="delete-button">
-                        <IconButton
-                        variant="contained"
-                        color="secondary"
-                        size="small"
-                        onClick={this.deleteSymbol}
-                        >
-                            <DeleteIcon id={stock.symbol}/>
-                        </IconButton>
-                    </div>
-                </MenuItem>
-            );
-            })}
-            {/* <MenuItem>
-                GME ${} USD
-                <Link to="/stock/gme" />
-            </MenuItem> */}
-            {/* <SubMenu title="Components">
-            <MenuItem>Component 1</MenuItem>
-            <MenuItem>Component 2</MenuItem>
-            </SubMenu> */}
-        </Menu>
-          )}
-                    
+                    <AuthContext.Consumer>{({ watchlist }) => (
+                        <Menu iconShape="square">
+                        {watchlist.map((stock) => {
+                            // if want to see unused rewards
+                            return (
+                                <MenuItem>
+                                    {stock.symbol.toUpperCase()} ${stock.price} USD
+                                    <Link to={"/stock/" + stock.symbol} />
+                                    <div className="delete-button">
+                                        <IconButton
+                                        variant="contained"
+                                        color="secondary"
+                                        size="small"
+                                        onClick={this.deleteSymbol}
+                                        >
+                                            <DeleteIcon id={stock.symbol}/>
+                                        </IconButton>
+                                    </div>
+                                </MenuItem>
+                            );
+                            })}
+                        </Menu>
+                    )}
                     </AuthContext.Consumer>
                 </ProSidebar>
             )

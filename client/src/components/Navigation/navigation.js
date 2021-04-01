@@ -28,33 +28,11 @@ class Navigation extends Component {
 
   render() {
     return (
+      <div class="sticky-top">
         <MDBNavbar color="indigo" dark expand="md">
           <MDBNavbarBrand>
             <MDBNavLink to="/home"><strong className="white-text">StockNow</strong></MDBNavLink>
           </MDBNavbarBrand>
-        
-            <MDBNavbarNav left>
-              {/* <MDBNavItem active>
-                <MDBNavLink to="/home">{this.context.email}</MDBNavLink>
-              </MDBNavItem> */}
-              
-              {/* {!this.context.token && <MDBNavItem>
-                <MDBNavLink to="/">Signed Out</MDBNavLink>
-              </MDBNavItem>} */}
-              {/* <MDBNavItem>
-                <MDBDropdown>
-                  <MDBDropdownToggle nav caret>
-                    <span className="mr-2">Dropdown</span>
-                  </MDBDropdownToggle>
-                  <MDBDropdownMenu>
-                    <MDBDropdownItem href="#!">Action</MDBDropdownItem>
-                    <MDBDropdownItem href="#!">Another Action</MDBDropdownItem>
-                    <MDBDropdownItem href="#!">Something else here</MDBDropdownItem>
-                    <MDBDropdownItem href="#!">Something else here</MDBDropdownItem>
-                  </MDBDropdownMenu>
-                </MDBDropdown>
-              </MDBNavItem> */}
-            </MDBNavbarNav>
             <MDBNavbarNav right>
               
               {this.context.token && 
@@ -84,6 +62,7 @@ class Navigation extends Component {
               }
             </MDBNavbarNav>
         </MDBNavbar>
+        </div>
       );
    }
 }
