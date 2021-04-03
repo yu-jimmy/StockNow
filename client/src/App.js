@@ -8,6 +8,7 @@ import AuthContext from './context/auth-context';
 import Dashboard from './components/Dashboard/dashboard';
 import StockDetails from './components/StockDetails/stockdetails';
 import Watchlist from './components/Watchlist/watchlist';
+import QrCode from './components/QrCode/qrcode';
 
 class App extends Component {
   state = {
@@ -56,6 +57,7 @@ class App extends Component {
                 <Route path="/home" component={Dashboard} />
                 <Route path="/signin" component={Landing} />
                 <Route path="/signup" component={Signup} />
+                <Route path="/qrcode" component={QrCode} />
                 <Route path="/stock/:symbol" component={withRouter(StockDetails)} />
               </Switch>
             </main>

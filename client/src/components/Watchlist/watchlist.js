@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import ClipLoader from "react-spinners/ClipLoader";
 import AuthContext from '../../context/auth-context';
 import { ProSidebar, Menu, MenuItem, SidebarHeader } from 'react-pro-sidebar';
+import { Button } from '@material-ui/core';
 import 'react-pro-sidebar/dist/css/styles.css';
 import './watchlist.css'
 import IconButton from '@material-ui/core/IconButton';
@@ -217,6 +218,7 @@ class Watchlist extends Component{
                         </Menu>
                     )}
                     </AuthContext.Consumer>
+                    <Button href="/qrcode" color='primary' variant="text">Generate A QrCode!</Button>
                 </ProSidebar>
             )
         }
