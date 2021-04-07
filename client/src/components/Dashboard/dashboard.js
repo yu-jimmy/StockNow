@@ -3,6 +3,7 @@ import AuthContext from '../../context/auth-context';
 import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
 import { Alert, AlertTitle } from '@material-ui/lab';
+import ClipLoader from "react-spinners/ClipLoader";
 
 const backend = process.env.NODE_ENV === 'production' ? 'https://stocknow.herokuapp.com' : 'http://localhost:4000';
 
@@ -33,89 +34,132 @@ class Dashboard extends Component{
 
     static contextType = AuthContext;
 
-    state = { rows: [] };
+    state = { 
+        rows: [],
+        news: [],
+    };
 
   componentDidMount() {
-    fetch(`${backend}/graphql`, {
-            method: 'POST',
-            body: JSON.stringify({query:`query{ userWatchList(email:"${this.context.email}") }`}),
-            headers:{'Content-Type': 'application/json'}
-        })
-        .then(data => {
-            if (data.status !== 200) throw new Error("Retrieving symbols failed");
-            return data.json();
-        })
-        .then(res => {
-            console.log(res.data.userWatchList);
-            this.setState({rows: res.data.userWatchList});
-        })
-        .catch(err => {
-            throw err;
-        });
+    let unirest = require("unirest");
+
+    let req = unirest("GET", "https://yahoo-finance15.p.rapidapi.com/api/yahoo/ne/news");
+
+    req.headers({
+        "x-rapidapi-key": "4ee5ac1e99mshef31668732a3510p16b7b4jsndc822db4aa01",
+        "x-rapidapi-host": "yahoo-finance15.p.rapidapi.com",
+        "useQueryString": true
+    });
+
+
+    req.end((res) => {
+        if (res.error) throw new Error(res.error);
+        this.setState({news: res.body});
+        console.log(res.body);
+    });
+    // fetch(`${backend}/graphql`, {
+    //         method: 'POST',
+    //         body: JSON.stringify({query:`query{ userWatchList(email:"${this.context.email}") }`}),
+    //         headers:{'Content-Type': 'application/json'}
+    //     })
+    //     .then(data => {
+    //         if (data.status !== 200) throw new Error("Retrieving symbols failed");
+    //         return data.json();
+    //     })
+    //     .then(res => {
+    //         console.log(res.data.userWatchList);
+    //         this.setState({rows: res.data.userWatchList});
+    //     })
+    //     .catch(err => {
+    //         throw err;
+    //     });
   }
 
   componentDidUpdate() {
-      console.log(this.context)
-    fetch(`${backend}/graphql`, {
-        method: 'POST',
-        body: JSON.stringify({query:`query{ userWatchList(email:"${this.context.email}") }`}),
-        headers:{'Content-Type': 'application/json'}
-    })
-    .then(data => {
-        if (data.status !== 200) throw new Error("Retrieving symbols failed");
-        return data.json();
-    })
-    .then(res => {
-        console.log(res.data.userWatchList);
-        if (!(res.data.userWatchList.length === this.state.rows.length)){
-             this.setState({rows: res.data.userWatchList});
-        }
-    })
-    .catch(err => {
-        throw err;
-    });
+    // console.log(this.context)
+    // fetch(`${backend}/graphql`, {
+    //     method: 'POST',
+    //     body: JSON.stringify({query:`query{ userWatchList(email:"${this.context.email}") }`}),
+    //     headers:{'Content-Type': 'application/json'}
+    // })
+    // .then(data => {
+    //     if (data.status !== 200) throw new Error("Retrieving symbols failed");
+    //     return data.json();
+    // })
+    // .then(res => {
+    //     console.log(res.data.userWatchList);
+    //     if (!(res.data.userWatchList.length === this.state.rows.length)){
+    //          this.setState({rows: res.data.userWatchList});
+    //     }
+    // })
+    // .catch(err => {
+    //     throw err;
+    // });
   }
 
   render() {
     const { classes } = this.props;
-    if (this.state.rows.length === 0){
+        if (this.state.news.length === 0){
+            return (
+            <div style={{width:'100%', paddingTop: 40, paddingLeft: '15%'}}>
+                <ClipLoader color={"blue"} loading={true}
+                                css={`
+                                display: block;
+                                margin: 0 auto;
+                                border-color: blue;
+                                `} size={150} />
+                </div>
+            )
+        }
+    // if (this.state.rows.length === 0){
+    //     return (
+    //         <div style={{paddingTop:40}}>
+    //             <Box className={classes.box} boxShadow={3}>
+    //                 <Alert severity="info">
+    //                     <AlertTitle>No stocks being watched!</AlertTitle>
+    //                     Search for a stock symbol and add it to your watch list
+    //                 </Alert>
+    //             </Box>
+    //         </div>
+    //     );
+    // }
+    else{
         return (
-            <div style={{paddingTop:40}}>
-                <Box className={classes.box} boxShadow={3}>
-                    <Alert severity="info">
-                        <AlertTitle>No stocks being watched!</AlertTitle>
-                        Search for a stock symbol and add it to your watch list
-                    </Alert>
-                </Box>
+            <div style={{width:'100%', paddingTop: 10, paddingLeft: '15%'}}>
+                <h1>Market News</h1>
+                {this.state.news.map((article) => {
+                    return(
+                        <div>
+                            <a href={article.link} target="blank">{article.title}</a>
+                            <p>Source: {article.source}<br></br>Posted on: {new Date(Date.parse(article.pubDate)).toLocaleDateString()}</p>
+                        </div>
+                    )
+                })}
+                {/* <Box className={classes.box} boxShadow={3}>
+                    <TableContainer>
+                        <Table className={classes.table} aria-label="simple table">
+                            <TableHead className={classes.head}>
+                                <TableRow>
+                                    <TableCell className={classes.cell}>
+                                        Your Stock WatchList!
+                                    </TableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {this.state.rows.map(row => (
+                                    <TableRow key={row}>
+                                        <TableCell component="th" scope="row">
+                                            {row}
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
+                </Box> */}
+                
             </div>
         );
     }
-    return (
-        <div style={{width:'100%', paddingTop: 40}}>
-            <Box className={classes.box} boxShadow={3}>
-                <TableContainer>
-                    <Table className={classes.table} aria-label="simple table">
-                        <TableHead className={classes.head}>
-                            <TableRow>
-                                <TableCell className={classes.cell}>
-                                    Your Stock WatchList!
-                                </TableCell>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {this.state.rows.map(row => (
-                                <TableRow key={row}>
-                                    <TableCell component="th" scope="row">
-                                        {row}
-                                    </TableCell>
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
-            </Box>
-        </div>
-    );
   }
 }
 
