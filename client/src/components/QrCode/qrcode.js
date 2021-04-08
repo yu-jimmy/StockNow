@@ -40,8 +40,6 @@ class QrCode extends Component {
                         "x-rapidapi-host": "apidojo-yahoo-finance-v1.p.rapidapi.com",
                         "useQueryString": true
                     });
-                console.log(quoteRes.body.quoteResponse.result)
-                console.log(quoteRes.body.quoteResponse.result.length)
                 if (quoteRes.body.quoteResponse.error === null && quoteRes.body.quoteResponse.result) {
                     let i;
                     for (i = 0; i< quoteRes.body.quoteResponse.result.length; i++) {

@@ -106,7 +106,6 @@ class Watchlist extends Component{
       
         this.interval = setInterval(() => {
             newState = this.state.stocks;
-            console.log(newState);
             fetch(`${backend}/graphql`, {
             method: 'POST',
             body: JSON.stringify({query:`query{ userWatchList(email:"${this.context.email}") }`}),
@@ -129,7 +128,6 @@ class Watchlist extends Component{
                         if (res.body) {
                             var watchlistSymbols = newState.map((stock) => {return stock.symbol})
                             if (!watchlistSymbols.includes(sym)){
-                                console.log(res.body);
                                 if (res.body.c) {
                                     newState.push({symbol: sym, price: res.body.c})
                                 }
