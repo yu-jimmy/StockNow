@@ -1,10 +1,7 @@
 import React, { Component }  from 'react';
 import AuthContext from '../../context/auth-context';
-import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
-import { Alert, AlertTitle } from '@material-ui/lab';
-
-const backend = process.env.NODE_ENV === 'production' ? 'https://stocknow.herokuapp.com' : 'http://localhost:4000';
+import ClipLoader from "react-spinners/ClipLoader";
 
 const useStyles = theme => ({
     root: {
@@ -33,89 +30,54 @@ class Dashboard extends Component{
 
     static contextType = AuthContext;
 
-    state = { rows: [] };
+    state = { 
+        errFetching: false,
+        news: [],
+    };
 
   componentDidMount() {
-    fetch(`${backend}/graphql`, {
-            method: 'POST',
-            body: JSON.stringify({query:`query{ userWatchList(email:"${this.context.email}") }`}),
-            headers:{'Content-Type': 'application/json'}
-        })
-        .then(data => {
-            if (data.status !== 200) throw new Error("Retrieving symbols failed");
-            return data.json();
-        })
-        .then(res => {
-            console.log(res.data.userWatchList);
-            this.setState({rows: res.data.userWatchList});
-        })
-        .catch(err => {
-            throw err;
-        });
-  }
+    const request = require('request');
 
-  componentDidUpdate() {
-      console.log(this.context)
-    fetch(`${backend}/graphql`, {
-        method: 'POST',
-        body: JSON.stringify({query:`query{ userWatchList(email:"${this.context.email}") }`}),
-        headers:{'Content-Type': 'application/json'}
-    })
-    .then(data => {
-        if (data.status !== 200) throw new Error("Retrieving symbols failed");
-        return data.json();
-    })
-    .then(res => {
-        console.log(res.data.userWatchList);
-        if (!(res.data.userWatchList.length === this.state.rows.length)){
-             this.setState({rows: res.data.userWatchList});
+    request('https://finnhub.io/api/v1/news?category=general&token=c1hea6f48v6qtr46akgg', { json: true }, (err, res) => {
+        if (err) { 
+          console.log(err);
+          this.setState({errFetching: true}) 
         }
-    })
-    .catch(err => {
-        throw err;
+        this.setState({news: res.body, errFetching: false});
     });
   }
 
   render() {
-    const { classes } = this.props;
-    if (this.state.rows.length === 0){
+    if (this.state.errFetching || this.state.news.length === 0){
         return (
-            <div style={{paddingTop:40}}>
-                <Box className={classes.box} boxShadow={3}>
-                    <Alert severity="info">
-                        <AlertTitle>No stocks being watched!</AlertTitle>
-                        Search for a stock symbol and add it to your watch list
-                    </Alert>
-                </Box>
+        <div style={{width:'100%', paddingTop: 40, paddingLeft: '15%'}}>
+            <ClipLoader color={"blue"} loading={true}
+                            css={`
+                            display: block;
+                            margin: 0 auto;
+                            border-color: blue;
+                            `} size={150} />
+            </div>
+        )
+    }
+    else{
+        return (
+            <div style={{paddingTop: 10, paddingLeft: '15%'}}>
+                <h1>Market News</h1>
+                <div style={{display: 'flex', flexWrap: "wrap", position: "relative"}}>
+                    {this.state.news.map((article) => {
+                        return(
+                            <div style={{flexGrow: 1, width: '25%' }}>
+                                <a href={article.url} target="blank"><img src={article.image} height="200px" alt="No Image Found"></img></a><br></br>
+                                <a href={article.url} target="blank">{article.headline}</a>
+                                <p>Source: {article.source}<br></br>Posted on: {new Date(article.datetime*1000).toLocaleDateString()}</p>
+                            </div>
+                        )
+                    })}
+                </div>
             </div>
         );
     }
-    return (
-        <div style={{width:'100%', paddingTop: 40}}>
-            <Box className={classes.box} boxShadow={3}>
-                <TableContainer>
-                    <Table className={classes.table} aria-label="simple table">
-                        <TableHead className={classes.head}>
-                            <TableRow>
-                                <TableCell className={classes.cell}>
-                                    Your Stock WatchList!
-                                </TableCell>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {this.state.rows.map(row => (
-                                <TableRow key={row}>
-                                    <TableCell component="th" scope="row">
-                                        {row}
-                                    </TableCell>
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
-            </Box>
-        </div>
-    );
   }
 }
 

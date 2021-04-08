@@ -3,25 +3,26 @@ import { Link } from 'react-router-dom';
 import ClipLoader from "react-spinners/ClipLoader";
 import AuthContext from '../../context/auth-context';
 import { ProSidebar, Menu, MenuItem, SidebarHeader } from 'react-pro-sidebar';
+import { Button } from '@material-ui/core';
 import 'react-pro-sidebar/dist/css/styles.css';
 import './watchlist.css'
 import IconButton from '@material-ui/core/IconButton';
 import DeleteIcon from '@material-ui/icons/Delete';
-var yahooFinance = require('yahoo-finance');
+//var yahooFinance = require('yahoo-finance');
 
 const backend = process.env.NODE_ENV === 'production' ? 'https://stocknow.herokuapp.com' : 'http://localhost:4000';
 
 class Watchlist extends Component{
     state = {
-        stocks: [
-        ],
+        stocks: [],
         finishedFetch: false,
+        notFound: false
     }
 
     static contextType = AuthContext;
 
     style = {
-        position: 'absolute',
+        position: 'fixed',
     }
 
     removeFromWatchlist = (symbol) => {
@@ -46,19 +47,16 @@ class Watchlist extends Component{
     }
 
     getQuote = (symbol) => {
-        return yahooFinance.quote({
-            symbol: symbol
-        }, function (err, quote) {
-            if (err){
-                console.log(err);
+        const request = require('request');
+
+        request(`https://finnhub.io/api/v1/quote?symbol=${symbol}&token=c1hea6f48v6qtr46akgg`, { json: true }, (err, res, body) => {
+            if (err) { 
+                console.log(err); 
+                throw err;
             }
-            return quote.price.regularMarketPrice;
-        }).then(res => {
-            if (res)
-                return res
-            // this.setState({finishedFetch: true, price: res.price.regularMarketPrice.toFixed(2)});
-        }).catch(err => {
-            throw err;
+            if (res.body) {
+                return res.body.c;
+            }
         });
     };
 
@@ -66,9 +64,6 @@ class Watchlist extends Component{
         this.context.test = "test";
         console.log(this.context.test)
         this.removeFromWatchlist(symbol.target.parentElement.id);
-        // var currentStocks = this.state.stocks;
-        // currentStocks = currentStocks.filter((stock) => { return stock.symbol.toUpperCase() !== symbol.target.parentElement.id.toUpperCase() });
-        // this.setState({stocks: currentStocks});
     }
 
     componentDidMount(){
@@ -89,23 +84,18 @@ class Watchlist extends Component{
                 this.setState({stocks: [], finishedFetch: true})
             }
             symbols.forEach((sym) => {
-                yahooFinance.quote({
-                    symbol: sym
-                }, function (err, quote) {
-                    if (err){
-                        console.log(err);
+                const request = require('request');
+
+                request(`https://finnhub.io/api/v1/quote?symbol=${sym}&token=c1hea6f48v6qtr46akgg`, { json: true }, (err, res, body) => {
+                    if (err) { 
+                        console.log(err); 
+                        throw err;
                     }
-                    return quote;
-                }).then(res => {
-                    if (res.price){
-                        newState.push({symbol: sym,
-                            price: res.price.regularMarketPrice})
-                        this.context.watchlist = newState
-                        this.setState({finishedFetch: true})
-                        // this.setState({stocks: newState, finishedFetch: true})
-                        }
-                }).catch(err => {
-                    throw err;
+                    if (res.body) {
+                        newState.push({symbol: sym, price: res.body.c});
+                        this.context.watchlist = newState;
+                        this.setState({finishedFetch: true});
+                    }
                 });
             });
         })
@@ -116,7 +106,6 @@ class Watchlist extends Component{
       
         this.interval = setInterval(() => {
             newState = this.state.stocks;
-            console.log(newState);
             fetch(`${backend}/graphql`, {
             method: 'POST',
             body: JSON.stringify({query:`query{ userWatchList(email:"${this.context.email}") }`}),
@@ -129,50 +118,30 @@ class Watchlist extends Component{
             .then(res => {
                 symbols = res.data.userWatchList;
                 symbols.forEach((sym) => {
-                    yahooFinance.quote({
-                        symbol: sym
-                    }, function (err, quote) {
-                        if (err){
-                            console.log(err);
+                    const request = require('request');
+
+                    request(`https://finnhub.io/api/v1/quote?symbol=${sym}&token=c1hea6f48v6qtr46akgg`, { json: true }, (err, res, body) => {
+                        if (err) { 
+                            console.log(err); 
+                            throw err;
                         }
-                        return quote;
-                    }).then(res => {
-                        if (res.price){
+                        if (res.body) {
                             var watchlistSymbols = newState.map((stock) => {return stock.symbol})
                             if (!watchlistSymbols.includes(sym)){
-                                console.log(res)
-                                if (res.price.regularMarketPrice){
-                                    if (res.price.regularMarketPrice.raw){
-                                        newState.push({symbol: sym,
-                                            price: res.price.regularMarketPrice.raw})
-                                        console.log(newState)
-                                        }
-                                        else{
-                                            newState.push({symbol: sym,
-                                                price: res.price.regularMarketPrice})
-                                                console.log(newState)
-                                        }
-                                    }
+                                if (res.body.c) {
+                                    newState.push({symbol: sym, price: res.body.c})
                                 }
-                            else{
+                            } else {
                                 newState.forEach((stock) => {
-                                    if (stock.symbol === sym){
-                                        if (res.price.regularMarketPrice){
-                                            if (res.price.regularMarketPrice.raw){
-                                            stock.price = res.price.regularMarketPrice.raw
-                                            }
-                                            else{
-                                                stock.price = res.price.regularMarketPrice
-                                            }
+                                    if (stock.symbol === sym) {
+                                        if (res.body.c) {
+                                            stock.price = res.body.c;
                                         }
                                     }
-                                })
+                                });
                             }
                             this.setState({stocks: newState, finishedFetch: true})
-                            }
-                            
-                    }).catch(err => {
-                        throw err;
+                        }
                     });
                 });
             })
@@ -223,40 +192,31 @@ class Watchlist extends Component{
                         </div>
                         
                     </SidebarHeader>
-                    
-        <AuthContext.Consumer>{({ watchlist }) => (
-            <Menu iconShape="square">
-            {watchlist.map((stock) => {
-            // if want to see unused rewards
-            return (
-                <MenuItem>
-                    {stock.symbol.toUpperCase()} ${stock.price} USD
-                    <Link to={"/stock/" + stock.symbol} />
-                    <div className="delete-button">
-                        <IconButton
-                        variant="contained"
-                        color="secondary"
-                        size="small"
-                        onClick={this.deleteSymbol}
-                        >
-                            <DeleteIcon id={stock.symbol}/>
-                        </IconButton>
-                    </div>
-                </MenuItem>
-            );
-            })}
-            {/* <MenuItem>
-                GME ${} USD
-                <Link to="/stock/gme" />
-            </MenuItem> */}
-            {/* <SubMenu title="Components">
-            <MenuItem>Component 1</MenuItem>
-            <MenuItem>Component 2</MenuItem>
-            </SubMenu> */}
-        </Menu>
-          )}
-                    
+                    <AuthContext.Consumer>{({ watchlist }) => (
+                        <Menu iconShape="square">
+                        {watchlist.map((stock) => {
+                            // if want to see unused rewards
+                            return (
+                                <MenuItem>
+                                    {stock.symbol.toUpperCase()} ${stock.price} USD
+                                    <Link to={"/stock/" + stock.symbol} />
+                                    <div className="delete-button">
+                                        <IconButton
+                                        variant="contained"
+                                        color="secondary"
+                                        size="small"
+                                        onClick={this.deleteSymbol}
+                                        >
+                                            <DeleteIcon id={stock.symbol}/>
+                                        </IconButton>
+                                    </div>
+                                </MenuItem>
+                            );
+                            })}
+                        </Menu>
+                    )}
                     </AuthContext.Consumer>
+                    <Button href="/qrcode" color='primary' variant="text">Generate A QrCode!</Button>
                 </ProSidebar>
             )
         }
