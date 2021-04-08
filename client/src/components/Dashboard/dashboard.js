@@ -40,22 +40,30 @@ class Dashboard extends Component{
     };
 
   componentDidMount() {
-    let unirest = require("unirest");
+    const request = require('request');
 
-    let req = unirest("GET", "https://yahoo-finance15.p.rapidapi.com/api/yahoo/ne/news");
-
-    req.headers({
-        "x-rapidapi-key": "4ee5ac1e99mshef31668732a3510p16b7b4jsndc822db4aa01",
-        "x-rapidapi-host": "yahoo-finance15.p.rapidapi.com",
-        "useQueryString": true
+    request('https://finnhub.io/api/v1/news?category=general&token=c1hea6f48v6qtr46akgg', { json: true }, (err, res) => {
+      if (err) { return console.log(err); }
+      console.log(res.body);
+      this.setState({news: res.body});
     });
 
+    // let unirest = require("unirest");
 
-    req.end((res) => {
-        if (res.error) throw new Error(res.error);
-        this.setState({news: res.body});
-        console.log(res.body);
-    });
+    // let req = unirest("GET", "https://yahoo-finance15.p.rapidapi.com/api/yahoo/ne/news");
+
+    // req.headers({
+    //     "x-rapidapi-key": "4ee5ac1e99mshef31668732a3510p16b7b4jsndc822db4aa01",
+    //     "x-rapidapi-host": "yahoo-finance15.p.rapidapi.com",
+    //     "useQueryString": true
+    // });
+
+
+    // req.end((res) => {
+    //     if (res.error) throw new Error(res.error);
+    //     this.setState({news: res.body});
+    //     console.log(res.body);
+    // });
     // fetch(`${backend}/graphql`, {
     //         method: 'POST',
     //         body: JSON.stringify({query:`query{ userWatchList(email:"${this.context.email}") }`}),
@@ -124,39 +132,41 @@ class Dashboard extends Component{
     // }
     else{
         return (
-            <div style={{width:'100%', paddingTop: 10, paddingLeft: '15%'}}>
+            <div style={{paddingTop: 10, paddingLeft: '15%'}}>
                 <h1>Market News</h1>
-                {this.state.news.map((article) => {
-                    return(
-                        <div>
-                            <a href={article.link} target="blank">{article.title}</a>
-                            <p>Source: {article.source}<br></br>Posted on: {new Date(Date.parse(article.pubDate)).toLocaleDateString()}</p>
-                        </div>
-                    )
-                })}
-                {/* <Box className={classes.box} boxShadow={3}>
-                    <TableContainer>
-                        <Table className={classes.table} aria-label="simple table">
-                            <TableHead className={classes.head}>
-                                <TableRow>
-                                    <TableCell className={classes.cell}>
-                                        Your Stock WatchList!
-                                    </TableCell>
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                {this.state.rows.map(row => (
-                                    <TableRow key={row}>
-                                        <TableCell component="th" scope="row">
-                                            {row}
+                <div style={{display: 'flex', flexWrap: "wrap", position: "relative"}}>
+                    {this.state.news.map((article) => {
+                        return(
+                            <div style={{flexGrow: 1, width: '25%' }}>
+                                <a href={article.url} target="blank"><img src={article.image} height="200px" alt="No Image Found"></img></a><br></br>
+                                <a href={article.url} target="blank">{article.headline}</a>
+                                <p>Source: {article.source}<br></br>Posted on: {new Date(article.datetime*1000).toLocaleDateString()}</p>
+                            </div>
+                        )
+                    })}
+                    {/* <Box className={classes.box} boxShadow={3}>
+                        <TableContainer>
+                            <Table className={classes.table} aria-label="simple table">
+                                <TableHead className={classes.head}>
+                                    <TableRow>
+                                        <TableCell className={classes.cell}>
+                                            Your Stock WatchList!
                                         </TableCell>
                                     </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
-                </Box> */}
-                
+                                </TableHead>
+                                <TableBody>
+                                    {this.state.rows.map(row => (
+                                        <TableRow key={row}>
+                                            <TableCell component="th" scope="row">
+                                                {row}
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
+                    </Box> */}
+                </div>
             </div>
         );
     }
