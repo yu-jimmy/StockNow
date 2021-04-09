@@ -44,7 +44,9 @@ class Dashboard extends Component{
           console.log(err);
           this.setState({errFetching: true}) 
         }
-        this.setState({news: res.body, errFetching: false});
+        if (res.body){
+            this.setState({news: res.body, errFetching: false});
+        }
     });
   }
 
