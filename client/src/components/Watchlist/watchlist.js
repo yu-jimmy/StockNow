@@ -61,8 +61,6 @@ class Watchlist extends Component{
     };
 
     deleteSymbol = (symbol) => {
-        this.context.test = "test";
-        console.log(this.context.test)
         this.removeFromWatchlist(symbol.target.parentElement.id);
     }
 

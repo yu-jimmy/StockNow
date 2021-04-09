@@ -66,7 +66,7 @@ class Landing extends React.Component {
 
         fetch(`${backend}/graphql`, {
             method: 'POST',
-            body: JSON.stringify({query:`query {login(email:"${email}", password:"${password}"){email userId token tokenExp symbols}}`}),
+            body: JSON.stringify({query:`query {login(email:"${email}", password:"${password}"){email userId token tokenExp symbols twoFactor twoFactorSecret twoFactorSecretAscii}}`}),
             headers: {
                 'Content-Type': 'application/json'
             }
@@ -78,7 +78,15 @@ class Landing extends React.Component {
         .then(res => {
           console.log(res);
           if (res.data.login.token){
-            this.context.login(res.data.login.email, res.data.login.userId, res.data.login.token, res.data.login.tokenExp, res.data.login.symbols);
+            this.context.login(res.data.login.email, 
+              res.data.login.userId, 
+              res.data.login.token, 
+              res.data.login.tokenExp, 
+              res.data.login.symbols, 
+              res.data.login.twoFactor, 
+              res.data.login.twoFactorSecret,
+              res.data.login.twoFactorSecretAscii
+              );
             this.setState({isError: false});
           }
         })

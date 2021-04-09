@@ -35,7 +35,7 @@ class Navigation extends Component {
           </MDBNavbarBrand>
             <MDBNavbarNav right>
               
-              {this.context.token && 
+              {this.context.successfulLogin && 
                 <MDBNavItem>
                   {/* <MDBFormInline waves> */}
                   <form onSubmit={this.searchSymbol}>
@@ -46,9 +46,9 @@ class Navigation extends Component {
                   {/* </MDBFormInline> */}
                 </MDBNavItem>
               }
-              {this.context.token &&
+              {this.context.successfulLogin &&
                 <MDBNavItem>
-                  <MDBNavLink to="/">
+                  <MDBNavLink to="/2fa">
                     {this.context.email}
                   </MDBNavLink>
                 </MDBNavItem>

@@ -13,7 +13,6 @@ import ButtonGroup from '@material-ui/core/ButtonGroup';
 import { withStyles } from '@material-ui/core/styles';
 import "./stockdetails.css";
 import {Line} from 'react-chartjs-2';
-//var yahooFinance = require('yahoo-finance');
 
 const backend = process.env.NODE_ENV === 'production' ? 'https://stocknow.herokuapp.com' : 'http://localhost:4000';
 

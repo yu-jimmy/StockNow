@@ -10,6 +10,7 @@
     "@testing-library/jest-dom": "^5.11.9",
     "@testing-library/react": "^11.2.5",
     "@testing-library/user-event": "^12.8.3",
+    "base32": "0.0.6",
     "chart.js": "^2.9.4",
     "mdbreact": "^5.0.1",
     "qrcode": "^1.4.4",

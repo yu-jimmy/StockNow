@@ -3,28 +3,14 @@ import AuthContext from '../../context/auth-context';
 import { withStyles } from '@material-ui/core/styles';
 import ClipLoader from "react-spinners/ClipLoader";
 import Grid from '@material-ui/core/Grid';
+import { Typography } from '@material-ui/core';
 
 const useStyles = theme => ({
     root: {
-        width: '100%',
-        '& > * + *': {
-          marginTop: theme.spacing(2),
-        },
-    },
-    table: {
-        width: 500,
-        margin: 'auto',
-    },
-    box: {
-        width: 500,
-        margin: 'auto',
-    },
-    head: {
-        backgroundColor: theme.palette.common.black
-    },
-    cell: {
-        color: theme.palette.common.white
-    }
+        ...theme.typography.h3,
+        backgroundColor: theme.palette.background.paper,
+        padding: theme.spacing(3),
+      },
   });
 
 class Dashboard extends Component{
@@ -51,6 +37,7 @@ class Dashboard extends Component{
   }
 
   render() {
+    const { classes } = this.props;
     if (this.state.errFetching || this.state.news.length === 0){
         return (
         <div style={{width:'100%', paddingTop: 40, paddingLeft: '15%'}}>
@@ -66,20 +53,20 @@ class Dashboard extends Component{
     else{
         return (
             <Grid style={{paddingLeft:300}}>
-            <div>
-                <h1>Market News</h1>
-                <div style={{display: 'flex', flexWrap: "wrap", position: "relative"}}>
-                    {this.state.news.map((article) => {
-                        return(
-                            <div style={{flexGrow: 1, width: '25%' }}>
-                                <a href={article.url} target="blank"><img src={article.image} height="200px" alt="No Image Found"></img></a><br></br>
-                                <a href={article.url} target="blank">{article.headline}</a>
-                                <p>Source: {article.source}<br></br>Posted on: {new Date(article.datetime*1000).toLocaleDateString()}</p>
-                            </div>
-                        )
-                    })}
+                <div>
+                    <Typography color="primary" paragraph="true" className={classes.root}>Here's the latest market news!</Typography>
+                    <div style={{display: 'flex', flexWrap: "wrap", position: "relative"}}>
+                        {this.state.news.map((article) => {
+                            return(
+                                <div style={{flexGrow: 1, width: '25%' }}>
+                                    <a href={article.url} target="blank"><img src={article.image} height="200px" alt="Not Found"></img></a><br></br>
+                                    <a href={article.url} target="blank">{article.headline}</a>
+                                    <p>Source: {article.source}<br></br>Posted on: {new Date(article.datetime*1000).toLocaleDateString()}</p>
+                                </div>
+                            )
+                        })}
+                    </div>
                 </div>
-            </div>
             </Grid>
         );
     }
