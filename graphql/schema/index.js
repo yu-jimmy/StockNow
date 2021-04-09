@@ -7,6 +7,9 @@ type User {
     password: String
     user: String!
     symbols: [String!]!
+    twoFactor: Boolean
+    twoFactorSecret: String
+    twoFactorSecretAscii: String
 }
 
 type AuthData {
@@ -15,6 +18,9 @@ type AuthData {
     token: String!
     tokenExp: Int!
     symbols: [String!]!
+    twoFactor: Boolean
+    twoFactorSecret: String
+    twoFactorSecretAscii: String
 }
 
 type RootQuery {
@@ -25,6 +31,7 @@ type RootQuery {
 type RootMutation {
     addSymbol(email: String!, symbol: String!): User
     deleteSymbol(email: String!, symbol: String!): User
+    activateTwoFactor(email: String!, secret: String!, asciiSecret: String!): User
     signup(email: String!, password: String!, user: String!): User
 }
 

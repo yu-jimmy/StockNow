@@ -68,6 +68,31 @@ module.exports = {
                 throw err;
             })
     },
+    activateTwoFactor: (args, req) => {
+        if (!req.isAuth) {
+            throw new Error("User is not authenticated");
+        }
+        return User.findOne({email: args.email})
+            .then(user => {
+                if (user == null) {
+                    throw new Error("User does not exist");
+                }
+                else {
+                    console.log("Activated");
+                    user.twoFactor = true;
+                    user.twoFactorSecret = args.secret;
+                    user.twoFactorSecretAscii = args.asciiSecret;
+                    return user.save()                
+                }
+            })
+            .then(result => {
+                return { ...result._doc }
+            })
+            .catch(err => {
+                console.log(err);
+                throw err;
+            })
+    },
     signup: (args) => {
         if(args.email === '' && args.password === '' && args.user === '') {
             throw new Error("Enter your credentials to register an account");
@@ -108,8 +133,12 @@ module.exports = {
                     email: args.email,
                     password: hash,
                     user: args.user,
-                    symbols: []
+                    symbols: [],
+                    twoFactor: false,
+                    twoFactorSecret: "",
+                    twoFactorSecretAscii: "",
                 });
+                console.log(newUser)
                 return newUser.save()
                     .then(result => {
                         return { ...result._doc, password: null };
@@ -127,6 +156,7 @@ module.exports = {
         const jwt = jsonwebtoken.sign({email: args.email, userId: user.id}, 'secret', {
             expiresIn: '12h'
         });
-        return {userId: user.id, email: args.email, token: jwt, tokenExp: 12, symbols: user.symbols};
+        console.log(user)
+        return {userId: user.id, email: args.email, token: jwt, tokenExp: 12, symbols: user.symbols, twoFactor: user.twoFactor, twoFactorSecret: user.twoFactorSecret, twoFactorSecretAscii: user.twoFactorSecretAscii};
     }
 };

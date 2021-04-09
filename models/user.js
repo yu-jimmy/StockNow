@@ -16,7 +16,16 @@ const userSchema = new Schema({
     },
     symbols: [{
         type: String
-    }]
+    }],
+    twoFactor: {
+        type: Boolean
+    },
+    twoFactorSecret: {
+        type: String
+    },
+    twoFactorSecretAscii: {
+        type: String
+    }
 });
 
 module.exports = mongoose.model('User', userSchema);
