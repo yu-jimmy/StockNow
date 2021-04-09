@@ -2,6 +2,7 @@ import React, { Component }  from 'react';
 import AuthContext from '../../context/auth-context';
 import { withStyles } from '@material-ui/core/styles';
 import ClipLoader from "react-spinners/ClipLoader";
+import Grid from '@material-ui/core/Grid';
 
 const useStyles = theme => ({
     root: {
@@ -43,7 +44,9 @@ class Dashboard extends Component{
           console.log(err);
           this.setState({errFetching: true}) 
         }
-        this.setState({news: res.body, errFetching: false});
+        if (res.body){
+            this.setState({news: res.body, errFetching: false});
+        }
     });
   }
 
@@ -62,7 +65,8 @@ class Dashboard extends Component{
     }
     else{
         return (
-            <div style={{paddingTop: 10, paddingLeft: '15%'}}>
+            <Grid style={{paddingLeft:300}}>
+            <div>
                 <h1>Market News</h1>
                 <div style={{display: 'flex', flexWrap: "wrap", position: "relative"}}>
                     {this.state.news.map((article) => {
@@ -76,6 +80,7 @@ class Dashboard extends Component{
                     })}
                 </div>
             </div>
+            </Grid>
         );
     }
   }

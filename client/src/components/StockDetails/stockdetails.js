@@ -89,7 +89,6 @@ class Dashboard extends Component{
                 this.setState({finishedFetch: true, notFound: true});
                 throw err; 
             }
-            console.log(res.body);
             if (res.body) {
                 this.setState({finishedFetch: true, notFound: false, price: res.body.c, open: res.body.o, high: res.body.h, low: res.body.l, close: res.body.pc});
             }
@@ -105,7 +104,6 @@ class Dashboard extends Component{
                 this.setState({finishedFetch: true, notFound: true});
                 throw err; 
             }
-            console.log(res.body);
             if (res.body) {
                 this.setState({finishedFetch: true, notFound: false, name: res.body.name});
             }
@@ -113,7 +111,6 @@ class Dashboard extends Component{
     }
 
     getChart = (symbol, range) => {
-        console.log("getting chart data");
         let unirest = require('unirest');
 
         let queryObj = {}
