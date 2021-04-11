@@ -1,11 +1,8 @@
 import React, { Component }  from 'react';
-import ClipLoader from "react-spinners/ClipLoader";
 import { withStyles } from '@material-ui/core/styles';
 import AuthContext from '../../context/auth-context';
 import { Grid, Typography, Button, TextField } from '@material-ui/core';
 
-
-const backend = process.env.NODE_ENV === 'production' ? 'https://stocknow.herokuapp.com' : 'http://localhost:4000';
 
 const useStyles = theme => ({
     root: {

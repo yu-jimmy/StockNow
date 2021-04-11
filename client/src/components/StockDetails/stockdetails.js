@@ -138,7 +138,7 @@ class Dashboard extends Component{
         unirest.get("https://apidojo-yahoo-finance-v1.p.rapidapi.com/market/get-charts")
             .query(queryObj)
             .headers({
-                "x-rapidapi-key": "a4c6ab8496mshad5bc2e98111fbbp19638ejsn2708817a9504",
+                "x-rapidapi-key": "94c82144a8msh2bc5073e8befb7ap17e3f1jsn80e91992ec53",
                 "x-rapidapi-host": "apidojo-yahoo-finance-v1.p.rapidapi.com",
                 "useQueryString": true
             })
