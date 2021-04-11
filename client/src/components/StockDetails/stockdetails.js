@@ -1,3 +1,5 @@
+// Chartjs in react tutorial: https://www.educative.io/edpresso/how-to-use-chartjs-to-create-charts-in-react
+
 import React, { Component } from 'react';
 import AuthContext from '../../context/auth-context';
 import ClipLoader from "react-spinners/ClipLoader";

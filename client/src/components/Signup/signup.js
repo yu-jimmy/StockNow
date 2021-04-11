@@ -1,3 +1,5 @@
+// Signup page template from material ui: https://material-ui.com/getting-started/templates/
+
 import React from 'react';
 import { NavLink, Redirect } from 'react-router-dom';
 import { Avatar, Button, Container, CssBaseline, TextField, Grid, Typography } from '@material-ui/core';

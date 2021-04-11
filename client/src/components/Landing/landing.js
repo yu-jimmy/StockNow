@@ -1,3 +1,12 @@
+/* Landing page image used: 
+    - Author: Nick Chong 
+    - Year produced: May 2020
+    - Title: Bitcoin (BTCUSD) price chart from TradingView
+    - URL: https://unsplash.com/photos/N__BnvQ_w18
+  
+  Landing page template from material UI: https://material-ui.com/getting-started/templates/
+*/
+
 import React from "react";
 import { NavLink } from 'react-router-dom';
 import { Avatar, Button, CssBaseline, TextField, Paper, Grid, Typography } from "@material-ui/core";
