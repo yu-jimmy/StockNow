@@ -2,6 +2,7 @@
 StockNow is a web application that allows the user to view realtime stock charts and manage their own list of stocks to watch.
 - **URL:** https://stocknow.herokuapp.com/
 - **VIDEO URL:** https://www.youtube.com/watch?v=-CLEj3IpOfU&ab_channel=JimmyY
+- **REFERENCES ARE INCLUDED AT THE TOP OF FILES WHERE APPLICABLE**
 
 ## Team Members
 

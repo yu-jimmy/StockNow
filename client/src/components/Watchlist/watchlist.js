@@ -1,3 +1,5 @@
+// React Pro Sidebar https://www.npmjs.com/package/react-pro-sidebar
+
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import ClipLoader from "react-spinners/ClipLoader";
@@ -8,7 +10,6 @@ import 'react-pro-sidebar/dist/css/styles.css';
 import './watchlist.css'
 import IconButton from '@material-ui/core/IconButton';
 import DeleteIcon from '@material-ui/icons/Delete';
-//var yahooFinance = require('yahoo-finance');
 
 const backend = process.env.NODE_ENV === 'production' ? 'https://stocknow.herokuapp.com' : 'http://localhost:4000';
 
