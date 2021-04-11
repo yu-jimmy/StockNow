@@ -1,3 +1,5 @@
+// React Context https://reactjs.org/docs/context.html
+
 import React from 'react';
 
 export default React.createContext({

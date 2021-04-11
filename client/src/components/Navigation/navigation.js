@@ -1,9 +1,8 @@
+// React Bootstrap Navbar https://mdbootstrap.com/docs/react/navigation/navbar/
+
 import React, { Component } from "react";
 import { withRouter } from 'react-router';
-import {
-MDBNavbar, MDBNavbarBrand, MDBNavbarNav, MDBNavItem, MDBNavLink,
-// MDBDropdown, MDBDropdownToggle, MDBDropdownMenu, MDBDropdownItem, MDBNavbarToggler
-} from "mdbreact";
+import { MDBNavbar, MDBNavbarBrand, MDBNavbarNav, MDBNavItem, MDBNavLink } from "mdbreact";
 import AuthContext from '../../context/auth-context';
 
 class Navigation extends Component {
