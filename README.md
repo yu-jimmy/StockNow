@@ -36,10 +36,9 @@ I'm currently a 3rd year Computer Science student, specializing in software engi
  - NodeJS
  - MongoDB
  - Yfinnance API
- - Native web APIs
-	 - Push notifications
- -	Google Authenticator
- -	QR codes
+ - 2FA with SpeakEasy and Google Authenticator
+ - QR codes
+ - Deployed on Heroku
 
 ## Top 5 Technical Challenges
 
