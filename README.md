@@ -5,6 +5,8 @@ StockNow is a web application that allows the user to view realtime stock charts
 - **API DOCUMENTATION:**: https://github.com/UTSCC09/project-all-in-gme/tree/master/API%20Documentation#readme
 - **REFERENCES ARE INCLUDED AT THE TOP OF FILES WHERE APPLICABLE**
 
+[![Watch the video](https://img.youtube.com/vi/-CLEj3IpOfU/maxresdefault.jpg)](https://www.youtube.com/watch?v=-CLEj3IpOfU&t=117s&ab_channel=JimmyY)
+
 ## Team Members
 
 ### Howard Leung `howardd.leung@mail.utoronto.ca`
